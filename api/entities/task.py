@@ -6,9 +6,9 @@ class Task():
   title:str
   notes:str
   updated:str
-  difficulty:int
-  required_time:int
-  priority:int
+  difficulty:int | None
+  required_time:int | None
+  priority:int | None
     
   def __init__(self, task_vo:TaskVO):
     self.id = task_vo.id
@@ -26,12 +26,16 @@ class Task():
       self.difficulty = info["difficulty"]
       self.required_time = info["required_time"]
       self.priority = info["priority"]
-    #print(f"info:{info}, title:{self.title}")
+    else:
+      self.difficulty = None
+      self.required_time = None
+      self.priority = None
+    print(f"info:{info}, title:{self.title}")
     return self
     
         
   def __str__(self):
     if self.difficulty:
-      return f"title:{self.title}, difficulty:{self.difficulty}"
+      return f"title:{self.title}, required_time:{self.required_time}, difficulty:{self.difficulty}"
     else:
       return f"title:{self.title}, difficulty:{None}"

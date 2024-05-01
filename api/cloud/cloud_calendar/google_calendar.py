@@ -14,7 +14,7 @@ class GoogleCalendar(GoogleBase):
     self.events = []
   
   #TODO# min_durationを設定できるように
-  def find_free_times(self, min_duration:int=15)->FreeTimeVO:
+  def find_free_times(self, min_duration:int=15)->list[FreeTimeVO]:
     """ for event in events:
       start = event["start"].get("dateTime", event["start"].get("date"))
       print(start, event["summary"]) """
