@@ -1,0 +1,13 @@
+# PostgreSQLのバージョンを指定
+FROM postgres:14
+
+# 環境変数
+ENV POSTGRES_DB=mydatabase
+ENV POSTGRES_USER=myuser
+ENV POSTGRES_PASSWORD=mypassword
+
+# カスタム設定ファイルをコンテナにコピー
+# COPY ./my-postgres.conf /etc/postgresql/postgresql.conf
+
+# カスタム初期化スクリプトをコンテナにコピー
+# COPY ./init-db.sh /docker-entrypoint-initdb.d/
