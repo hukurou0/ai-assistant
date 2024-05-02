@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException
+from suggest_todo import find_well_todos
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
@@ -39,3 +40,8 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
         hello_world = result.scalar_one()
         print(hello_world)
     return {"message": hello_world}
+  
+@app.get("/find")
+def read_root():
+    well_todos = find_well_todos()
+    return {"data": well_todos}
