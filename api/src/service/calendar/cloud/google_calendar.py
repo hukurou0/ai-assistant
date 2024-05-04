@@ -5,7 +5,7 @@ import pytz
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from src.service.cloud.common.google_base import GoogleBase
+from src.service.cloud.google_base import GoogleBase
 
 from src.domain.vos.free_time import FreeTimeVO
 

@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException
-from src.service.cloud.calendar.google_calendar import GoogleCalendarService
-from src.service.cloud.todo.google_todo import GoogleTodoService
+from src.service.calendar.cloud.google_calendar import GoogleCalendarService
+from src.service.todo.cloud.google_todo import GoogleTodoService
 from src.service.suggest_todo import SuggestTodoService
 
 # データベース設定
