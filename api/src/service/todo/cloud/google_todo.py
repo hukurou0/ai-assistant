@@ -4,7 +4,7 @@ from googleapiclient.errors import HttpError
 from src.service.cloud.google_base import GoogleBase
 
 from pydantic import BaseModel
-from src.domain.vos.todo_list import TodoListVO
+from src.domain.entities.todo_list import TodoList
 from src.domain.vos.todo import TodoVO
 
 class GoogleTodoService(GoogleBase, BaseModel):
@@ -33,7 +33,7 @@ class GoogleTodoService(GoogleBase, BaseModel):
     except HttpError as err:
       print(err)
 
-  def fetch_todo_lists(self)->list[TodoListVO]:
+  def fetch_todo_lists(self)->list[TodoList]:
     creds = self.get_cred()
 
     try:
@@ -43,7 +43,7 @@ class GoogleTodoService(GoogleBase, BaseModel):
       results = service.tasklists().list(maxResults=10).execute()
       items = results.get("items", [])
       todo_lists = [
-        TodoListVO(
+        TodoList(
           id = item["id"],
           title = item["title"],
           updated = item["updated"],
