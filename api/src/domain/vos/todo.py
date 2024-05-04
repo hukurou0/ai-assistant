@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass()
-class TaskVO():
+class TodoVO():
   id:str
   title:str
   updated:str

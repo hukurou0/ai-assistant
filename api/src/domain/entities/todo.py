@@ -1,7 +1,7 @@
-from src.service.llm.gpt.evaluation import fetch_evaluation_task
-from src.domain.vos.task import TaskVO
+from src.service.llm.gpt.evaluation import fetch_evaluation_todo
+from src.domain.vos.todo import TodoVO
 
-class Task():
+class Todo():
   id:str
   title:str
   notes:str
@@ -10,18 +10,18 @@ class Task():
   required_time:int | None
   priority:int | None
     
-  def __init__(self, task_vo:TaskVO):
-    self.id = task_vo.id
-    self.title = task_vo.title
-    self.notes = task_vo.notes
-    self.updated = task_vo.updated
+  def __init__(self, todo_vo:TodoVO):
+    self.id = todo_vo.id
+    self.title = todo_vo.title
+    self.notes = todo_vo.notes
+    self.updated = todo_vo.updated
     
   @classmethod
-  def from_vo(cls, task_vo:TaskVO, id=None):
-    return cls(task_vo)
+  def from_vo(cls, todo_vo:TodoVO, id=None):
+    return cls(todo_vo)
     
   def fetch_evaluation(self):
-    info = fetch_evaluation_task(self.title)
+    info = fetch_evaluation_todo(self.title)
     if info:
       self.difficulty = info["difficulty"]
       self.required_time = info["required_time"]

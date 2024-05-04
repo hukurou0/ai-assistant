@@ -1,12 +1,12 @@
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from src.domain.vos.todo_list import TodoListVO
-from src.domain.vos.task import TaskVO
+from src.domain.vos.todo import TodoVO
 
 from src.service.cloud.google_base import GoogleBase
 
 class GoogleTodoService(GoogleBase):
-  def fetch_tasks_from_list_id(self, todo_list_id):
+  def fetch_todos_from_list_id(self, todo_list_id):
     creds = self.get_cred()
 
     try:
@@ -15,8 +15,8 @@ class GoogleTodoService(GoogleBase):
       # Call the Tasks API
       results = service.tasks().list(tasklist = todo_list_id).execute()
       items = results.get("items", [])
-      tasks = [
-        TaskVO(
+      todos = [
+        TodoVO(
           id=item["id"],
           title=item["title"],
           updated=item["updated"],
@@ -27,7 +27,7 @@ class GoogleTodoService(GoogleBase):
         )
         for item in items
       ]
-      return tasks
+      return todos
     except HttpError as err:
       print(err)
 
@@ -45,7 +45,7 @@ class GoogleTodoService(GoogleBase):
           id = item["id"],
           title = item["title"],
           updated = item["updated"],
-          tasks = self.fetch_tasks_from_list_id(item["id"])
+          todos = self.fetch_todos_from_list_id(item["id"])
         ) 
         for item in items
       ]

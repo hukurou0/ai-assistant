@@ -7,7 +7,7 @@ load_dotenv()
 
 #TODO# titleのみで推論。プロンプトでlist名やnotesを混ぜたりなどで精度改善
 #TODO# Noneの時に再リクエス処理(回数制限やモデル変えるなど)
-def fetch_evaluation_task(title: str) -> dict:
+def fetch_evaluation_todo(title: str) -> dict:
   content = f"以下のタスクのpriorityとdifficultyとrequired_timeを教えてください\n\
     タスク：{title}"
 
@@ -22,12 +22,12 @@ def fetch_evaluation_task(title: str) -> dict:
               tool_choice=None,
             )
   if response.choices[0].message.function_call:
-    evaluation_task = response.choices[0].message.function_call.arguments
-    return eval(evaluation_task) # エラー処理必要
+    evaluation_todo = response.choices[0].message.function_call.arguments
+    return eval(evaluation_todo) # エラー処理必要
   else:
     print(f"title:{title}")
     return None
 
-#task = "年金を払う"
-#print(fetch_evaluation_task(task)) 
+#todo = "年金を払う"
+#print(fetch_evaluation_todo(todo)) 
         
