@@ -4,6 +4,9 @@ from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException
 from suggest_todo import find_well_todos
 
+from entities.task import Task
+from vo.free_time import FreeTimeVO
+
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
 
@@ -44,4 +47,23 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
 @app.get("/find")
 def read_root():
     well_todos = find_well_todos()
-    return {"data": well_todos}
+    response_well_todos = []
+    for well_todo in well_todos:
+        free_time:FreeTimeVO = well_todo["free_time"]
+        todo:Task = well_todo["complete_todo"]
+        
+        response_well_todo = {
+            "free_time":{
+                "start":free_time.start,
+                "end":free_time.end,
+                "duration":free_time.duration
+            },
+            "todo":{
+                "title":todo.title,
+                "required_time":todo.required_time,
+                "difficulty":todo.difficulty
+            }
+        }
+        response_well_todos.append(response_well_todo)
+        
+    return {"well_todos": response_well_todos}

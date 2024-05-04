@@ -22,8 +22,8 @@ def find_well_todos():
       if complete_todo.required_time:
         if free_time.duration >= complete_todo.required_time:
           well_todo = {
-            "free_time":free_time.__str__(),
-            "complete_todo":complete_todo.__str__()
+            "free_time":free_time,
+            "complete_todo":complete_todo
           }
           well_todos.append(well_todo)
           free_time.duration -= complete_todo.required_time
