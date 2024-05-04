@@ -5,7 +5,7 @@ from src.service.cloud.google_base import GoogleBase
 
 from pydantic import BaseModel
 from src.domain.entities.todo_list import TodoList
-from src.domain.vos.todo import TodoVO
+from src.domain.entities.todo import Todo
 
 class GoogleTodoService(GoogleBase, BaseModel):
   def fetch_todos_from_list_id(self, todo_list_id):
@@ -18,7 +18,7 @@ class GoogleTodoService(GoogleBase, BaseModel):
       results = service.tasks().list(tasklist = todo_list_id).execute()
       items = results.get("items", [])
       todos = [
-        TodoVO(
+        Todo(
           id=item["id"],
           title=item["title"],
           updated=item["updated"],

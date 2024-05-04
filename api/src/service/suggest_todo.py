@@ -16,7 +16,7 @@ class SuggestTodoService(BaseModel):
 
     complete_todo_list:list[Todo] = []
     for todo_list in todo_lists:
-      complete_todo_list.extend([Todo.from_vo(todo).fetch_evaluation() for todo in todo_list.todos])
+      complete_todo_list.extend([todo.fetch_evaluation() for todo in todo_list.todos])
 
     well_todos:list[SuggestTodoVO] = []
     for free_time in free_times:

@@ -1,9 +1,9 @@
 from pydantic import BaseModel
-from src.domain.vos.todo import TodoVO
+from src.domain.entities.todo import Todo
 
 class TodoList(BaseModel, frozen=True):
   id:str
   title:str
   updated:str
-  todos:list[TodoVO]
+  todos:list[Todo]
   
