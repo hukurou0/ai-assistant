@@ -1,8 +1,7 @@
-from dataclasses import dataclass
 from datetime import datetime
+from pydantic import BaseModel
 
-@dataclass()
-class FreeTimeVO():
+class FreeTimeVO(BaseModel, frozen=True):
   duration:int
   start:datetime
   end:datetime

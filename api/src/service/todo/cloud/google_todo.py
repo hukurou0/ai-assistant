@@ -1,11 +1,13 @@
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from src.domain.vos.todo_list import TodoListVO
-from src.domain.vos.todo import TodoVO
 
 from src.service.cloud.google_base import GoogleBase
 
-class GoogleTodoService(GoogleBase):
+from pydantic import BaseModel
+from src.domain.vos.todo_list import TodoListVO
+from src.domain.vos.todo import TodoVO
+
+class GoogleTodoService(GoogleBase, BaseModel):
   def fetch_todos_from_list_id(self, todo_list_id):
     creds = self.get_cred()
 

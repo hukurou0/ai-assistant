@@ -7,11 +7,12 @@ from googleapiclient.errors import HttpError
 
 from src.service.cloud.google_base import GoogleBase
 
+from pydantic import BaseModel
+from typing import ClassVar, List
 from src.domain.vos.free_time import FreeTimeVO
 
-class GoogleCalendarService(GoogleBase):
-  def __init__(self):
-    self.events = []
+class GoogleCalendarService(GoogleBase, BaseModel):
+  events: ClassVar[List] = []
   
   #TODO# min_durationを設定できるように
   def find_free_times(self, min_duration:int=15)->list[FreeTimeVO]:
@@ -41,7 +42,7 @@ class GoogleCalendarService(GoogleBase):
 
     # 最後のイベント後の空き時間も追加
     if start_of_free_time < end:
-      duration = (end - start_of_free_time).total_seconds() / 60
+      duration = int((end - start_of_free_time).total_seconds() / 60)
       free_times.append(FreeTimeVO(duration = duration, start = start_of_free_time, end = end))
         
     return free_times

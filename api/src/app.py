@@ -47,13 +47,15 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
 def read_root():
     calendar_service = GoogleCalendarService()
     todo_service = GoogleTodoService()
-    suggest_todo_service = SuggestTodoService(calendar_service, todo_service)
+    suggest_todo_service = SuggestTodoService(calendar_service=calendar_service, todo_service=todo_service)
     well_todos = suggest_todo_service.find_well_todos()
     
     response_well_todos = []
     for well_todo in well_todos:
-        free_time = well_todo["free_time"]
-        todo = well_todo["complete_todo"]
+        print(well_todo)
+        free_time = well_todo.free_time
+        todo = well_todo.complete_todo
+        print(free_time)
         
         response_well_todo = {
             "free_time":{

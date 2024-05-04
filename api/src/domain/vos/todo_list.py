@@ -1,8 +1,7 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 from src.domain.vos.todo import TodoVO
 
-@dataclass(frozen=True)
-class TodoListVO():
+class TodoListVO(BaseModel, frozen=True):
   id:str
   title:str
   updated:str
