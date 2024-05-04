@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from vo.task import TaskVO
+from src.vo.task import TaskVO
 
 @dataclass(frozen=True)
 class TodoListVO():

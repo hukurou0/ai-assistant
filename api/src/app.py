@@ -2,10 +2,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException
-from suggest_todo import find_well_todos
+from src.suggest_todo import find_well_todos
 
-from entities.task import Task
-from vo.free_time import FreeTimeVO
+from src.entities.task import Task
+from src.vo.free_time import FreeTimeVO
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"

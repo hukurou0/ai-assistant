@@ -1,9 +1,9 @@
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from vo.todo_list import TodoListVO
-from vo.task import TaskVO
+from src.vo.todo_list import TodoListVO
+from src.vo.task import TaskVO
 
-from cloud.common.google_base import GoogleBase
+from src.cloud.common.google_base import GoogleBase
 
 class GoogleTodo(GoogleBase):
   def fetch_tasks_from_list_id(self, todo_list_id):

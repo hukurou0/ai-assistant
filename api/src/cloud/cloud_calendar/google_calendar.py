@@ -5,9 +5,9 @@ import pytz
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from cloud.common.google_base import GoogleBase
+from src.cloud.common.google_base import GoogleBase
 
-from vo.free_time import FreeTimeVO
+from src.vo.free_time import FreeTimeVO
 
 class GoogleCalendar(GoogleBase):
   def __init__(self):
