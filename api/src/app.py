@@ -2,10 +2,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException
-from src.suggest_todo import find_well_todos
-
-from src.domain.entities.task import Task
-from src.domain.vos.free_time import FreeTimeVO
+from src.service.cloud.calendar.google_calendar import GoogleCalendarService
+from src.service.cloud.todo.google_todo import GoogleTodoService
+from src.service.suggest_todo import SuggestTodoService
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
@@ -46,11 +45,15 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
   
 @app.get("/find")
 def read_root():
-    well_todos = find_well_todos()
+    calendar_service = GoogleCalendarService()
+    todo_service = GoogleTodoService()
+    suggest_todo_service = SuggestTodoService(calendar_service, todo_service)
+    well_todos = suggest_todo_service.find_well_todos()
+    
     response_well_todos = []
     for well_todo in well_todos:
-        free_time:FreeTimeVO = well_todo["free_time"]
-        todo:Task = well_todo["complete_todo"]
+        free_time = well_todo["free_time"]
+        todo = well_todo["complete_todo"]
         
         response_well_todo = {
             "free_time":{

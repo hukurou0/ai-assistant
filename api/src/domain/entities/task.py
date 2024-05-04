@@ -1,4 +1,4 @@
-from src.llm.gpt.evaluation import fetch_evaluation_task
+from src.service.llm.gpt.evaluation import fetch_evaluation_task
 from src.domain.vos.task import TaskVO
 
 class Task():

@@ -5,11 +5,11 @@ import pytz
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from src.cloud.common.google_base import GoogleBase
+from src.service.cloud.common.google_base import GoogleBase
 
 from src.domain.vos.free_time import FreeTimeVO
 
-class GoogleCalendar(GoogleBase):
+class GoogleCalendarService(GoogleBase):
   def __init__(self):
     self.events = []
   

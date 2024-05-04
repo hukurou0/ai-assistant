@@ -3,9 +3,9 @@ from googleapiclient.errors import HttpError
 from src.domain.vos.todo_list import TodoListVO
 from src.domain.vos.task import TaskVO
 
-from src.cloud.common.google_base import GoogleBase
+from src.service.cloud.common.google_base import GoogleBase
 
-class GoogleTodo(GoogleBase):
+class GoogleTodoService(GoogleBase):
   def fetch_tasks_from_list_id(self, todo_list_id):
     creds = self.get_cred()
 

@@ -1,5 +1,5 @@
 from openai import OpenAI
-from src.llm.gpt import tools
+from src.service.llm.gpt import tools
 from dotenv import load_dotenv
 import os
 
