@@ -23,8 +23,6 @@ services:
       - postgres
     environment:
       DATABASE_URL: postgres://myuser:mypassword@postgres/mydatabase
-    tty: true # ターミナルを開いた状態に保つ
-    stdin_open: true # 標準入力を開いた状態に保つ
 
 volumes:
   pgdata:
