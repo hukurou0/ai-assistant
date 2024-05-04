@@ -7,7 +7,7 @@ from googleapiclient.errors import HttpError
 
 from src.cloud.common.google_base import GoogleBase
 
-from src.vo.free_time import FreeTimeVO
+from src.domain.vos.free_time import FreeTimeVO
 
 class GoogleCalendar(GoogleBase):
   def __init__(self):

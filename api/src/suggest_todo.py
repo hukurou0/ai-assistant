@@ -1,8 +1,8 @@
-from src.cloud.cloud_calendar.google_calendar import GoogleCalendar
-from src.cloud.cloud_todo.google_todo import GoogleTodo
+from src.cloud.calendar.google_calendar import GoogleCalendar
+from src.cloud.todo.google_todo import GoogleTodo
 
-from src.entities.task import Task
-from src.vo.todo_list import TodoListVO
+from src.domain.entities.task import Task
+from src.domain.vos.todo_list import TodoListVO
   
 
 def find_well_todos():  

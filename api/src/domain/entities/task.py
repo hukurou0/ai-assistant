@@ -1,5 +1,5 @@
 from src.llm.gpt.evaluation import fetch_evaluation_task
-from src.vo.task import TaskVO
+from src.domain.vos.task import TaskVO
 
 class Task():
   id:str

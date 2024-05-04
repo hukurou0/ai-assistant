@@ -4,8 +4,8 @@ from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException
 from src.suggest_todo import find_well_todos
 
-from src.entities.task import Task
-from src.vo.free_time import FreeTimeVO
+from src.domain.entities.task import Task
+from src.domain.vos.free_time import FreeTimeVO
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
