@@ -10,9 +10,9 @@ class SuggestTodoService(BaseModel):
   calendar_service:Union[GoogleCalendarService]
   todo_service:Union[GoogleTodoService]
 
-  def find_well_todos(self):  
+  async def find_well_todos(self):  
     free_times = self.calendar_service.find_free_times()
-    todo_lists = self.todo_service.fetch_todo_lists()
+    todo_lists = await self.todo_service.fetch_todo_lists()
 
     complete_todo_list:list[Todo] = []
     for todo_list in todo_lists:

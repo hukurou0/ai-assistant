@@ -23,7 +23,8 @@ engine = create_async_engine(
 async_session = sessionmaker(
     engine, 
     expire_on_commit=False, 
-    class_=AsyncSession
+    class_=AsyncSession,
+    autocommit=False
 )
 
 # FastAPI アプリケーション
@@ -44,11 +45,11 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
     return {"message": hello_world}
   
 @app.get("/find")
-def read_root():
+async def read_root(db: AsyncSession = Depends(get_db_session)):
     calendar_service = GoogleCalendarService()
-    todo_service = GoogleTodoService()
+    todo_service = GoogleTodoService(session = db)
     suggest_todo_service = SuggestTodoService(calendar_service=calendar_service, todo_service=todo_service)
-    well_todos = suggest_todo_service.find_well_todos()
+    well_todos = await suggest_todo_service.find_well_todos()
     
     response_well_todos = []
     for well_todo in well_todos:
