@@ -4,4 +4,4 @@ from src.domain.vos.free_time import FreeTimeVO
 
 class SuggestTodoVO(BaseModel):
     free_time: FreeTimeVO
-    complete_todo: Todo
+    todo: Todo

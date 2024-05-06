@@ -2,7 +2,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from src.service.cloud.google_base import GoogleBase
-from src.repository.todo_repository import TodoRepository
+from src.repository.todo_list_repository import TodoListRepository
 
 from pydantic import BaseModel
 from src.domain.entities.todo_list import TodoList
@@ -25,37 +25,7 @@ session = Session() """
 class GoogleTodoService(GoogleBase, BaseModel):
   session:Any
   
-  async def fetch_todos_from_list_id(self, todo_list_id):
-    creds = self.get_cred()
-
-    try:
-      service = build("tasks", "v1", credentials=creds)
-
-      # Call the Tasks API
-      results = service.tasks().list(tasklist = todo_list_id).execute()
-      items = results.get("items", [])
-      repository = TodoRepository(session=self.session)
-      todos = [
-        Todo(
-          id=          item["id"],
-          title=       item["title"],
-          updated=     item["updated"],
-          position=    item["position"],
-          status=      item["status"],
-          due=         item.get("due",""),
-          notes=       item.get("notes",""),
-          repository = repository
-        )
-        for item in items
-      ]
-      async with repository.session.begin():
-        for todo in todos:
-            await repository.create(todo, batch=True)
-      return todos
-    except HttpError as err:
-      print(err)
-
-  async def fetch_todo_lists(self)->list[TodoList]:
+  async def _fetch_todo_lists(self)->list[TodoList]:
     creds = self.get_cred()
 
     try:
@@ -69,7 +39,6 @@ class GoogleTodoService(GoogleBase, BaseModel):
           id = item["id"],
           title = item["title"],
           updated = item["updated"],
-          todos = await self.fetch_todos_from_list_id(item["id"])
         ) 
         for item in items
       ]
@@ -78,3 +47,45 @@ class GoogleTodoService(GoogleBase, BaseModel):
       print(err)
       return err
   
+  async def _fetch_todos_from_todo_list(self, todo_list:TodoList)->list[TodoList]:
+    creds = self.get_cred()
+
+    try:
+      service = build("tasks", "v1", credentials=creds)
+
+      # Call the Tasks API
+      results = service.tasks().list(tasklist = todo_list.id).execute()
+      items = results.get("items", [])
+      todos = [
+        Todo(
+          id=          item["id"],
+          title=       item["title"],
+          updated=     item["updated"],
+          position=    item["position"],
+          status=      item["status"],
+          due=         item.get("due",""),
+          notes=       item.get("notes",""),
+        )
+        for item in items
+      ]
+      
+      todo_list.todos = todos
+      
+      repository = TodoListRepository(session=self.session)
+      async with repository.session.begin():
+        await repository.create(todo_list)
+      
+    except HttpError as err:
+      print(err)
+      
+    return todo_list
+      
+  async def fetch_todos(self):
+    todo_lists = await self._fetch_todo_lists()
+    all_todos = []
+    for todo_list in todo_lists:
+      todos = await self._fetch_todos_from_todo_list(todo_list)
+      all_todos.extend(todos)
+    return all_todos
+  
+#complete_todos:list[Todo] = [todo.fetch_evaluation() for todo in todos]
