@@ -2,8 +2,10 @@ from openai import OpenAI
 from src.service.llm.gpt import tools
 from dotenv import load_dotenv
 import os
+import datetime
 
 from src.repository.todo_repository import TodoRepository
+from src.repository.todo_list_repository import TodoListRepository
 
 from pydantic import BaseModel
 from typing import Any
@@ -42,10 +44,32 @@ class GPT4EvaluationService(BaseModel):
         await self.evaluation_todo(todo, todo_list)
       return todo_list.todos
     
-  async def fetch_complete_todos(self, todo_lists): # -> list[Todo]:
+  async def fetch_complete_todos(self, fetch_todo_lists): # -> list[Todo]:
     all_complete_todos = []
-    for todo_list in todo_lists:
-      todos = await self.evaluation_todo_list(todo_list)
-      all_complete_todos.extend(todos)
+    repo = TodoListRepository(session = self.session)
+    for fetch_todo_list in fetch_todo_lists:
+      last_todo_list = await repo.get(fetch_todo_list)
+      if last_todo_list.last_evaluation: # 過去にevaluationしたか（新規作成のリストだとevaluationしていない）
+        last_evaluation_time = last_todo_list.last_evaluation
+        if fetch_todo_list.updated > last_evaluation_time:
+          # 変更があるため再評価
+          print("変更有",fetch_todo_list)
+          todos = await self.evaluation_todo_list(fetch_todo_list)
+          all_complete_todos.extend(todos)
+          fetch_todo_list.last_evaluation = datetime.datetime.now()
+          await repo.update_last_evaluation(fetch_todo_list)
+        else:
+          # 変更がないため再評価しない
+          print("変更なし",fetch_todo_list)
+          if last_todo_list.todos:
+            todos = last_todo_list.todos
+            all_complete_todos.extend(todos)
+      else:
+        # 新規のリストのtodoを評価
+        print("新規作成")
+        todos = await self.evaluation_todo_list(fetch_todo_list)
+        all_complete_todos.extend(todos)
+        fetch_todo_list.last_evaluation = datetime.datetime.now()
+        await repo.update_last_evaluation(fetch_todo_list)
     return all_complete_todos
           

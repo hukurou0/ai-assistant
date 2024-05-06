@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from src.models.todo_model import TodoModel
+from src.domain.entities.todo import Todo
 from sqlalchemy import update
 from typing import Any
 
@@ -7,6 +8,20 @@ class TodoMapper:
   @staticmethod
   def to_model(todo_entity, todo_list_id):
     return TodoModel(todo_entity=todo_entity, todo_list_id=todo_list_id)
+  @staticmethod
+  def to_entity(todo_model):
+    return Todo(
+      id=todo_model.id,
+      title=todo_model.title,
+      notes=todo_model.notes,
+      updated=todo_model.updated,
+      position=todo_model.position,
+      status=todo_model.status,
+      due=todo_model.due,
+      difficulty=todo_model.difficulty,
+      required_time=todo_model.required_time,
+      priority=todo_model.priority,
+      )
 
 class TodoRepository(BaseModel):
   session:Any

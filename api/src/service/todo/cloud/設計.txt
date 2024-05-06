@@ -1,0 +1,2 @@
+Google todoはまずリストを取得してその後中身のtodoを取得する。
+この時、リストにもtodoにもupdated属性があり、todoへのアクションでリストのupdatedが更新される。

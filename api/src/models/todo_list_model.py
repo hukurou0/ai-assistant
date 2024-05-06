@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String
+from sqlalchemy import create_engine, Column, String, DateTime
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 # データベースの接続情報
@@ -20,12 +20,14 @@ class TodoListModel(Base):
 
     id = Column(String, primary_key=True)
     title = Column(String, nullable=False)
-    updated = Column(String)
+    updated = Column(DateTime(timezone=True))
+    last_evaluation = Column(DateTime(timezone=True))
     
     def __init__(self, todo_list_entity):
         self.id       = todo_list_entity.id
         self.title    = todo_list_entity.title
         self.updated  = todo_list_entity.updated
+        self.last_evaluation  = todo_list_entity.last_evaluation
 
     def __repr__(self):
         return f"<TodoList(id={self.id}, title='{self.title}')>"

@@ -1,5 +1,6 @@
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import datetime
 
 from src.service.cloud.google_base import GoogleBase
 from src.repository.todo_list_repository import TodoListRepository
@@ -38,7 +39,7 @@ class GoogleTodoService(GoogleBase, BaseModel):
         TodoList(
           id = item["id"],
           title = item["title"],
-          updated = item["updated"],
+          updated = datetime.datetime.fromisoformat(item["updated"][:-1] + '+00:00')
         ) 
         for item in items
       ]
@@ -58,13 +59,13 @@ class GoogleTodoService(GoogleBase, BaseModel):
       items = results.get("items", [])
       todos = [
         Todo(
-          id=          item["id"],
-          title=       item["title"],
-          updated=     item["updated"],
-          position=    item["position"],
-          status=      item["status"],
-          due=         item.get("due",""),
-          notes=       item.get("notes",""),
+          id              = item["id"],
+          title           = item["title"],
+          updated         = item["updated"],
+          position        = item["position"],
+          status          = item["status"],
+          due             = item.get("due",""),
+          notes           = item.get("notes",""),
         )
         for item in items
       ]
@@ -73,7 +74,7 @@ class GoogleTodoService(GoogleBase, BaseModel):
       
       repository = TodoListRepository(session=self.session)
       async with repository.session.begin():
-        await repository.create(todo_list)
+        await repository.save(todo_list)
       
     except HttpError as err:
       print(err)

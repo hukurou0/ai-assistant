@@ -13,7 +13,7 @@ DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
 # SQLAlchemy用のエンジンを作成
 engine = create_async_engine(
   DATABASE_URL, 
-  echo=True,
+  #echo=True,
   pool_size=5,          # プール内のコネクション数
   max_overflow=10,      # プールサイズを超えた際の最大数
   pool_timeout=30,      # プールからコネクションを取得する際のタイムアウト秒数
@@ -38,12 +38,8 @@ async def get_db_session() -> AsyncSession:
 
 # ルートエンドポイント
 @app.get("/")
-async def read_root(db: AsyncSession = Depends(get_db_session)):
-    async with db.begin():
-        result = await db.execute(text("SELECT 'Hello, World!'"))
-        hello_world = result.scalar_one()
-        print(hello_world)
-    return {"message": hello_world}
+async def read_root():
+    return {"message": "hello_world"}
   
 @app.get("/find")
 async def read_root(db: AsyncSession = Depends(get_db_session)):
@@ -55,10 +51,8 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
     
     response_well_todos = []
     for well_todo in well_todos:
-        print(well_todo)
         free_time = well_todo.free_time
         todo = well_todo.todo
-        print(free_time)
         
         response_well_todo = {
             "free_time":{

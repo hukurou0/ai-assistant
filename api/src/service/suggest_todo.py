@@ -11,10 +11,14 @@ class SuggestTodoService(BaseModel):
   todo_service:Union[GoogleTodoService]
   evaluation_service:Union[GPT4EvaluationService]
 
-  async def find_well_todos(self):  
+  async def find_well_todos(self): 
+    print("find_well_todos_start") 
     free_times = self.calendar_service.find_free_times()
+    print("get_free_times") 
     todo_lists = await self.todo_service.fetch_todo_lists()
+    print("get_todo_list") 
     complete_todos = await self.evaluation_service.fetch_complete_todos(todo_lists)
+    print("get_complete_todo") 
 
     well_todos:list[SuggestTodoVO] = []
     for free_time in free_times:
