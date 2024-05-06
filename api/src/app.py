@@ -5,6 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from src.service.calendar.cloud.google_calendar import GoogleCalendarService
 from src.service.todo.cloud.google_todo import GoogleTodoService
 from src.service.suggest_todo import SuggestTodoService
+from src.service.llm.gpt.evaluation import GPT4EvaluationService
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
@@ -48,14 +49,15 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
 async def read_root(db: AsyncSession = Depends(get_db_session)):
     calendar_service = GoogleCalendarService()
     todo_service = GoogleTodoService(session = db)
-    suggest_todo_service = SuggestTodoService(calendar_service=calendar_service, todo_service=todo_service)
+    evaluation_service = GPT4EvaluationService(session = db)
+    suggest_todo_service = SuggestTodoService(calendar_service=calendar_service, todo_service=todo_service, evaluation_service=evaluation_service)
     well_todos = await suggest_todo_service.find_well_todos()
     
     response_well_todos = []
     for well_todo in well_todos:
         print(well_todo)
         free_time = well_todo.free_time
-        todo = well_todo.complete_todo
+        todo = well_todo.todo
         print(free_time)
         
         response_well_todo = {
