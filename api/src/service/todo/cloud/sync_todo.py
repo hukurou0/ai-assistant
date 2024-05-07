@@ -9,6 +9,5 @@ class SyncTodoService(BaseModel):
   
   async def execute(self):
     todo_lists = await self.todo_service.fetch_todo_lists_from_google()
-    print(todo_lists)
     complete_todos = await self.evaluation_service.do_evaluation(todo_lists)
     return "success"

@@ -17,11 +17,6 @@ class Todo(BaseModel):
     self.difficulty    = evaluation_params["difficulty"]
     self.required_time = evaluation_params["required_time"]
     self.priority      = evaluation_params["priority"]
-    """ else:
-      self.difficulty = None
-      self.required_time = None
-      self.priority = None
-    print(f"info:{info}, title:{self.title}") """
     return self
     
         

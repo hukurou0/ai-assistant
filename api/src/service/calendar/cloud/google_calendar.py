@@ -15,11 +15,7 @@ class GoogleCalendarService(GoogleBase, BaseModel):
   events: ClassVar[List] = []
   
   #TODO# min_durationを設定できるように
-  def find_free_times(self, min_duration:int=15)->list[FreeTimeVO]:
-    """ for event in events:
-      start = event["start"].get("dateTime", event["start"].get("date"))
-      print(start, event["summary"]) """
-      
+  def find_free_times(self, min_duration:int=15)->list[FreeTimeVO]:      
     free_times:list[FreeTimeVO] = []
     tz_tokyo = pytz.timezone('Asia/Tokyo')
     now = datetime.now(tz_tokyo)
