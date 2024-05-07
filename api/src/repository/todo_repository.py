@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from src.models.todo_model import TodoModel
 from src.domain.entities.todo import Todo
 from sqlalchemy import update
+from sqlalchemy.future import select
 from typing import Any
 
 class TodoMapper:
@@ -38,3 +39,10 @@ class TodoRepository(BaseModel):
     stmt = update(TodoModel).where(TodoModel.id == todo_entity.id).values(difficulty=todo_entity.difficulty,required_time=todo_entity.required_time,priority=todo_entity.priority)
     await self.session.execute(stmt)
     await self.session.commit()
+    
+  async def get_own_todos(self):
+    query = select(TodoModel)
+    result = await self.session.execute(query)
+    todo_models = result.scalars().all()
+    todo_entities = [TodoMapper.to_entity(todo_model) for todo_model in todo_models]
+    return todo_entities

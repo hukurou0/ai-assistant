@@ -6,6 +6,7 @@ from src.service.calendar.cloud.google_calendar import GoogleCalendarService
 from src.service.todo.cloud.google_todo import GoogleTodoService
 from src.service.suggest_todo import SuggestTodoService
 from src.service.llm.gpt.evaluation import GPT4EvaluationService
+from src.service.todo.cloud.sync_todo import SyncTodoService
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
@@ -40,13 +41,22 @@ async def get_db_session() -> AsyncSession:
 @app.get("/")
 async def read_root():
     return {"message": "hello_world"}
+
+@app.get("/sync/google-todo")
+async def sync_google(db: AsyncSession = Depends(get_db_session)):
+    todo_service = GoogleTodoService(session = db)
+    evaluation_service = GPT4EvaluationService(session = db)
+    sync_todo_service = SyncTodoService(todo_service=todo_service, evaluation_service=evaluation_service)
+    result = await sync_todo_service.execute()
+    if result == "success":
+        return {"message": "success"}
+    
   
 @app.get("/find")
 async def read_root(db: AsyncSession = Depends(get_db_session)):
     calendar_service = GoogleCalendarService()
-    todo_service = GoogleTodoService(session = db)
-    evaluation_service = GPT4EvaluationService(session = db)
-    suggest_todo_service = SuggestTodoService(calendar_service=calendar_service, todo_service=todo_service, evaluation_service=evaluation_service)
+    todo_service = GoogleTodoService(session = db)  
+    suggest_todo_service = SuggestTodoService(calendar_service=calendar_service, todo_service=todo_service)
     well_todos = await suggest_todo_service.find_well_todos()
     
     response_well_todos = []

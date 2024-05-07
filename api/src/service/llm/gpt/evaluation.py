@@ -44,22 +44,22 @@ class GPT4EvaluationService(BaseModel):
         await self.evaluation_todo(todo, todo_list)
       return todo_list.todos
     
-  async def fetch_complete_todos(self, fetch_todo_lists): # -> list[Todo]:
+  async def do_evaluation(self, fetch_todo_lists): # -> list[Todo]:
     all_complete_todos = []
     repo = TodoListRepository(session = self.session)
     for fetch_todo_list in fetch_todo_lists:
       last_todo_list = await repo.get(fetch_todo_list)
-      if last_todo_list.last_evaluation: # 過去にevaluationしたか（新規作成のリストだとevaluationしていない）
+      if last_todo_list.last_evaluation: # 新規作成のリストだとNullになっているので評価
         last_evaluation_time = last_todo_list.last_evaluation
         if fetch_todo_list.updated > last_evaluation_time:
-          # 変更があるため再評価
+          # 内容に変更があるため再評価
           print("変更有",fetch_todo_list)
           todos = await self.evaluation_todo_list(fetch_todo_list)
           all_complete_todos.extend(todos)
           fetch_todo_list.last_evaluation = datetime.datetime.now()
           await repo.update_last_evaluation(fetch_todo_list)
         else:
-          # 変更がないため再評価しない
+          # 変更がないため評価しない
           print("変更なし",fetch_todo_list)
           if last_todo_list.todos:
             todos = last_todo_list.todos
