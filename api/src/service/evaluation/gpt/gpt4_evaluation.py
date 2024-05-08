@@ -15,7 +15,6 @@ load_dotenv()
 class GPT4EvaluationService(BaseModel):
   session:Any
   
-  #TODO# titleのみで推論。プロンプトでlist名やnotesを混ぜたりなどで精度改善
   #TODO# Noneの時に再リクエス処理(回数制限やモデル変えるなど)
   async def evaluation_todo(self, todo, todo_list): # -> Todo
     content = f"Please let me know the PRIORITY, DIFFICULTY and REQUIRED_TIME for the following tasks.\n\
