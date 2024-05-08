@@ -8,14 +8,16 @@ from googleapiclient.errors import HttpError
 from src.service.utils.google_base import GoogleBase
 
 from pydantic import BaseModel
-from typing import ClassVar, List
+from typing import List, Optional
 from src.domain.vos.free_time import FreeTimeVO
 
 class GoogleCalendarService(GoogleBase, BaseModel):
-  events: ClassVar[List] = []
+  events: Optional[List] = []
   
   #TODO# min_durationを設定できるように
-  def find_free_times(self, min_duration:int=15)->list[FreeTimeVO]:      
+  def find_free_times(self, min_duration:int=15)->list[FreeTimeVO]: 
+    self._get_events()
+         
     free_times:list[FreeTimeVO] = []
     tz_tokyo = pytz.timezone('Asia/Tokyo')
     now = datetime.now(tz_tokyo)
@@ -44,7 +46,7 @@ class GoogleCalendarService(GoogleBase, BaseModel):
     return free_times
   
   #TODO# 複数のカレンダーをon,off出来るように
-  def get_events(self):
+  def _get_events(self):
     creds = self.get_cred()
     try:
       service = build("calendar", "v3", credentials=creds)

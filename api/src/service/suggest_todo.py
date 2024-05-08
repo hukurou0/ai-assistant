@@ -11,6 +11,7 @@ class SuggestTodoService(BaseModel):
 
   async def find_well_todos(self): 
     free_times = self.calendar_service.find_free_times()
+    print(free_times)
     todos = await self.todo_service.fetch_todos()
 
     well_todos:list[SuggestTodoVO] = []
