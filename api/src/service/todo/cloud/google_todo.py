@@ -2,7 +2,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import datetime
 
-from src.service.cloud.google_base import GoogleBase
+from src.service.utils.google_base import GoogleBase
 from src.repository.todo_list_repository import TodoListRepository
 from src.repository.todo_repository import TodoRepository
 

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Union
 from src.service.todo.cloud.google_todo import GoogleTodoService
-from src.service.llm.gpt.evaluation import GPT4EvaluationService
+from src.service.evaluation.gpt.gpt4_evaluation import GPT4EvaluationService
 
 class SyncTodoService(BaseModel):
   todo_service:Union[GoogleTodoService]

@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from src.service.calendar.cloud.google_calendar import GoogleCalendarService
 from src.service.todo.cloud.google_todo import GoogleTodoService
 from src.service.suggest_todo import SuggestTodoService
-from src.service.llm.gpt.evaluation import GPT4EvaluationService
+from src.service.evaluation.gpt.gpt4_evaluation import GPT4EvaluationService
 from src.service.todo.cloud.sync_todo import SyncTodoService
 from src.service.todo.local_todo import LocalTodoService
 
