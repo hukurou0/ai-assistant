@@ -44,6 +44,7 @@ async def read_root():
     return {"message": "hello_world"}
 
 #TODO# Google-todoで削除したときにsyncできるように（現状DBに残り続ける）
+#TODO# Google-todoでtodoのみアップデートされた時syncできるように（listのupdatedが変わらないためスキップされる）
 @app.get("/sync/google-todo")
 async def sync_google(db: AsyncSession = Depends(get_db_session)):
     todo_service = GoogleTodoService(session = db)
