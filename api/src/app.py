@@ -7,6 +7,7 @@ from src.service.todo.cloud.google_todo import GoogleTodoService
 from src.service.suggest_todo import SuggestTodoService
 from src.service.llm.gpt.evaluation import GPT4EvaluationService
 from src.service.todo.cloud.sync_todo import SyncTodoService
+from src.service.todo.local_todo import LocalTodoService
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
@@ -56,7 +57,7 @@ async def sync_google(db: AsyncSession = Depends(get_db_session)):
 @app.get("/find")
 async def read_root(db: AsyncSession = Depends(get_db_session)):
     calendar_service = GoogleCalendarService()
-    todo_service = GoogleTodoService(session = db)  
+    todo_service = LocalTodoService(session = db)  
     suggest_todo_service = SuggestTodoService(calendar_service=calendar_service, todo_service=todo_service)
     well_todos = await suggest_todo_service.find_well_todos()
     

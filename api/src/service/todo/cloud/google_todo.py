@@ -82,17 +82,10 @@ class GoogleTodoService(GoogleBase, BaseModel):
       
     return todo_list
       
-  async def fetch_todo_lists_from_google(self):
+  async def fetch_todo_lists(self):
     todo_lists = await self._fetch_todo_lists()
     all_todo_lists = []
     for todo_list in todo_lists:
       todo_list_have_todos = await self._fetch_todos_from_todo_list(todo_list)
       all_todo_lists.append(todo_list_have_todos)
     return all_todo_lists
-  
-  async def fetch_todos_from_localdb(self):
-    repo = TodoRepository(session=self.session)
-    todos = await repo.get_own_todos()
-    return todos
-  
-#complete_todos:list[Todo] = [todo.fetch_evaluation() for todo in todos]
