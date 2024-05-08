@@ -62,3 +62,19 @@ class TodoListRepository(BaseModel):
     await self.session.execute(stmt)
     await self.session.commit()
     
+  async def fetch_user_todo_lists(self):
+    user_todo_lists = []
+    
+    stmt = select(TodoListModel)
+    results = await self.session.execute(stmt)
+    todo_list_models = results.scalars().all()
+    for todo_list_model in todo_list_models:
+      stmt = select(TodoModel).where(TodoModel.todo_list_id == todo_list_model.id)
+      results = await self.session.execute(stmt)
+      todo_models = results.scalars().all()
+      todo_entities = [TodoMapper.to_entity(todo_model) for todo_model in todo_models]
+      todo_list_entity = TodoListMapper.to_entity(todo_list_model,todo_entities)
+      user_todo_lists.append(todo_list_entity)
+      
+    return user_todo_lists
+    

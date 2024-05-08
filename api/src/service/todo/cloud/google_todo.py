@@ -9,7 +9,7 @@ from src.repository.todo_repository import TodoRepository
 from pydantic import BaseModel
 from src.domain.entities.todo_list import TodoList
 from src.domain.entities.todo import Todo
-from typing import Any
+from typing import Any, Optional
 
 
 from sqlalchemy import create_engine
@@ -26,6 +26,7 @@ session = Session() """
 
 class GoogleTodoService(GoogleBase, BaseModel):
   session:Any
+  todo_lists:Optional[list[TodoList]] = None
   
   async def _fetch_todo_lists(self)->list[TodoList]:
     creds = self.get_cred()
@@ -49,7 +50,7 @@ class GoogleTodoService(GoogleBase, BaseModel):
       print(err)
       return err
   
-  async def _fetch_todos_from_todo_list(self, todo_list:TodoList)->list[TodoList]:
+  async def _fetch_todos_from_todo_list(self, todo_list:TodoList)->TodoList:
     creds = self.get_cred()
 
     try:
@@ -74,10 +75,6 @@ class GoogleTodoService(GoogleBase, BaseModel):
       
       todo_list.todos = active_todos
       
-      repository = TodoListRepository(session=self.session)
-      async with repository.session.begin():
-        await repository.save(todo_list)
-      
     except HttpError as err:
       print(err)
       
@@ -85,8 +82,13 @@ class GoogleTodoService(GoogleBase, BaseModel):
       
   async def fetch_todo_lists(self):
     todo_lists = await self._fetch_todo_lists()
-    all_todo_lists = []
+    all_todo_lists:list[TodoList] = []
     for todo_list in todo_lists:
       todo_list_have_todos = await self._fetch_todos_from_todo_list(todo_list)
       all_todo_lists.append(todo_list_have_todos)
-    return all_todo_lists
+    self.todo_lists = all_todo_lists
+    
+  async def do_import_to_local(self):
+    repository = TodoListRepository(session=self.session)
+    for todo_list in self.todo_lists:
+      await repository.save(todo_list)

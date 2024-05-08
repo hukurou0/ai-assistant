@@ -8,6 +8,7 @@ class SyncTodoService(BaseModel):
   evaluation_service:Union[GPT4EvaluationService]
   
   async def execute(self):
-    todo_lists = await self.todo_service.fetch_todo_lists()
-    complete_todos = await self.evaluation_service.do_evaluation(todo_lists)
+    await self.todo_service.fetch_todo_lists()
+    await self.todo_service.do_import_to_local()
+    complete_todos = await self.evaluation_service.do_evaluation()
     return "finished"

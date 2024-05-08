@@ -50,8 +50,8 @@ async def sync_google(db: AsyncSession = Depends(get_db_session)):
     evaluation_service = GPT4EvaluationService(session = db)
     sync_todo_service = SyncTodoService(todo_service=todo_service, evaluation_service=evaluation_service)
     result = await sync_todo_service.execute()
-    if result == "success":
-        return {"message": "success"}
+    if result == "finished":
+        return {"message": "finished"}
     
   
 @app.get("/find")

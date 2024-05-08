@@ -49,32 +49,33 @@ class GPT4EvaluationService(BaseModel):
         await self.evaluation_todo(todo, todo_list)
       return todo_list.todos
     
-  async def do_evaluation(self, fetch_todo_lists): # -> list[Todo]:
+  async def do_evaluation(self): # -> list[Todo]:
     all_complete_todos = []
     repo = TodoListRepository(session = self.session)
-    for fetch_todo_list in fetch_todo_lists:
-      last_todo_list = await repo.get(fetch_todo_list)
+    user_todo_lists = await repo.fetch_user_todo_lists()
+    for user_todo_list in user_todo_lists:
+      last_todo_list = await repo.get(user_todo_list)
       if last_todo_list.last_evaluation: # 新規作成のリストだとNullになっているので評価
         last_evaluation_time = last_todo_list.last_evaluation
-        if fetch_todo_list.updated > last_evaluation_time:
+        if user_todo_list.updated > last_evaluation_time:
           # 内容に変更があるため再評価
-          print("変更有",fetch_todo_list)
-          todos = await self.evaluation_todo_list(fetch_todo_list)
+          print("変更有",user_todo_list)
+          todos = await self.evaluation_todo_list(user_todo_list)
           all_complete_todos.extend(todos)
-          fetch_todo_list.last_evaluation = datetime.datetime.now()
-          await repo.update_last_evaluation(fetch_todo_list)
+          user_todo_list.last_evaluation = datetime.datetime.now()
+          await repo.update_last_evaluation(user_todo_list)
         else:
           # 変更がないため評価しない
-          print("変更なし",fetch_todo_list)
+          print("変更なし",user_todo_list)
           if last_todo_list.todos:
             todos = last_todo_list.todos
             all_complete_todos.extend(todos)
       else:
         # 新規のリストのtodoを評価
         print("新規作成")
-        todos = await self.evaluation_todo_list(fetch_todo_list)
+        todos = await self.evaluation_todo_list(user_todo_list)
         all_complete_todos.extend(todos)
-        fetch_todo_list.last_evaluation = datetime.datetime.now()
-        await repo.update_last_evaluation(fetch_todo_list)
+        user_todo_list.last_evaluation = datetime.datetime.now()
+        await repo.update_last_evaluation(user_todo_list)
     return all_complete_todos
           
