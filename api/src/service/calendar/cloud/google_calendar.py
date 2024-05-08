@@ -34,7 +34,7 @@ class GoogleCalendarService(GoogleBase, BaseModel):
       if start_of_free_time < start_of_event:
         duration = (start_of_event - start_of_free_time).total_seconds() / 60
         if duration >= min_duration:
-          free_times.append(FreeTimeVO(duration = duration, start = start_of_free_time, end = start_of_event))
+          free_times.append(FreeTimeVO(duration = int(duration), start = start_of_free_time, end = start_of_event))
       end_of_event = tz_tokyo.localize(datetime.fromisoformat(event['end'].get('dateTime', event['end'].get('date'))).replace(tzinfo=None))
       start_of_free_time = max(start_of_free_time, end_of_event)
 
