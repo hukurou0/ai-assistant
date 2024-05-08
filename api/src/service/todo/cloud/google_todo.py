@@ -70,8 +70,9 @@ class GoogleTodoService(GoogleBase, BaseModel):
         )
         for item in items
       ]
+      active_todos = [todo for todo in todos if todo.status != "completed"]
       
-      todo_list.todos = todos
+      todo_list.todos = active_todos
       
       repository = TodoListRepository(session=self.session)
       async with repository.session.begin():

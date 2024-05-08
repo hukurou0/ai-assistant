@@ -18,8 +18,14 @@ class GPT4EvaluationService(BaseModel):
   #TODO# titleのみで推論。プロンプトでlist名やnotesを混ぜたりなどで精度改善
   #TODO# Noneの時に再リクエス処理(回数制限やモデル変えるなど)
   async def evaluation_todo(self, todo, todo_list): # -> Todo
-    content = f"以下のタスクのpriorityとdifficultyとrequired_timeを教えてください\n\
-      タスク：{todo.title}"
+    content = f"Please let me know the PRIORITY, DIFFICULTY and REQUIRED_TIME for the following tasks.\n\
+      If it is difficult to reason about PRIORITY, DIFFICULTY and REQUIRED_TIME, do not return anything.\n\
+      TodoListTitle:{todo_list.title}\n\
+      TodoTitle:{todo.title}"
+      
+    if todo.notes:
+      content += f"\n\
+        Notes:{todo.notes}"
 
     model = "gpt-4-turbo-preview"
 
@@ -28,11 +34,11 @@ class GPT4EvaluationService(BaseModel):
     response = client.chat.completions.create(
                 model=model,
                 messages=[{"role": "user", "content": content}],
-                functions=tools.tools,
-                tool_choice=None,
+                tools=tools.tools,
+                tool_choice="auto",
               )
-    if response.choices[0].message.function_call:
-      evaluation_params = eval(response.choices[0].message.function_call.arguments)
+    if response.choices[0].message.tool_calls[0].function:
+      evaluation_params = eval(response.choices[0].message.tool_calls[0].function.arguments)
       todo.add_evaluation(evaluation_params)
       repository = TodoRepository(session=self.session)
       await repository.update_evaluation(todo)
