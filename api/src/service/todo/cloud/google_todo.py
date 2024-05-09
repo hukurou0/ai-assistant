@@ -91,4 +91,5 @@ class GoogleTodoService(GoogleBase, BaseModel):
   async def do_import_to_local(self):
     repository = TodoListRepository(session=self.session)
     for todo_list in self.todo_lists:
+      print(todo_list)
       await repository.save(todo_list)
