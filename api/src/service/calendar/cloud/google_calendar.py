@@ -42,8 +42,17 @@ class GoogleCalendarService(GoogleBase, BaseModel):
     if start_of_free_time < end:
       duration = int((end - start_of_free_time).total_seconds() / 60)
       free_times.append(FreeTimeVO(duration = duration, start = start_of_free_time, end = end))
-        
+
     return free_times
+  
+  def _parse_event_datetime(self, event_start):
+    dt_str = event_start.get('dateTime') or event_start.get('date')
+    dt = datetime.fromisoformat(dt_str)
+    # タイムゾーン情報がない場合、日本のタイムゾーンを設定
+    if dt.tzinfo is None:
+        tz_japan = pytz.timezone('Asia/Tokyo')
+        dt = tz_japan.localize(dt)
+    return dt
   
   #TODO# 複数のカレンダーをon,off出来るように
   def _get_events(self):
@@ -87,5 +96,5 @@ class GoogleCalendarService(GoogleBase, BaseModel):
       print(f"An error occurred: {error}")
     
     all_events = events + class_times
-    sorted_events = sorted(all_events, key=lambda x: datetime.fromisoformat(x['start'].get('dateTime', x['start'].get('date'))))  
+    sorted_events = sorted(all_events, key=lambda x: self._parse_event_datetime(event_start = x['start']))  
     self.events = sorted_events

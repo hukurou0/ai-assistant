@@ -4,8 +4,7 @@ from dotenv import load_dotenv
 import os
 import datetime
 
-from src.repository.todo_repository import TodoRepository
-from src.repository.todo_list_repository import TodoListRepository
+from src.repository.todo_list_repo import TodoListRepo
 
 from pydantic import BaseModel
 from typing import Any
@@ -36,46 +35,35 @@ class GPT4EvaluationService(BaseModel):
                 tools=tools.tools,
                 tool_choice="auto",
               )
-    if response.choices[0].message.tool_calls[0].function:
+    if response.choices[0].message.tool_calls:
       evaluation_params = eval(response.choices[0].message.tool_calls[0].function.arguments)
       todo.add_evaluation(evaluation_params)
-      repository = TodoRepository(session=self.session)
-      await repository.update_evaluation(todo)
+      todo_list.update_todo(todo)
     else:
       print(f"評価失敗「title:{todo.title}」")
     
-  async def evaluation_todo_list(self, todo_list): # -> list[Todo]
-      for todo in todo_list.todos:
-        await self.evaluation_todo(todo, todo_list)
-      return todo_list.todos
+  async def evaluation_todo_in_list(self, todo_list): # -> list[Todo]
+    for todo in todo_list.get_todos():
+      await self.evaluation_todo(todo, todo_list)
     
+  #TODO# なぜかuser_todo_list.last_evaluationがDBにデータがあってもNoneになっている。そのため毎回新規作成が走る。修正必要
   async def do_evaluation(self): # -> list[Todo]:
-    all_complete_todos = []
-    repo = TodoListRepository(session = self.session)
-    user_todo_lists = await repo.fetch_user_todo_lists()
+    repo = TodoListRepo(session = self.session)
+    user_todo_lists = await repo.fetch_user_lists_with_todos()
     for user_todo_list in user_todo_lists:
-      last_todo_list = await repo.get(user_todo_list)
-      if last_todo_list.last_evaluation: # 新規作成のリストだとNullになっているので評価
-        last_evaluation_time = last_todo_list.last_evaluation
-        if user_todo_list.updated > last_evaluation_time:
-          # 内容に変更があるため再評価
-          print("変更有",user_todo_list)
-          todos = await self.evaluation_todo_list(user_todo_list)
-          all_complete_todos.extend(todos)
-          user_todo_list.last_evaluation = datetime.datetime.now()
-          await repo.update_last_evaluation(user_todo_list)
-        else:
-          # 変更がないため評価しない
-          print("変更なし",user_todo_list)
-          if last_todo_list.todos:
-            todos = last_todo_list.todos
-            all_complete_todos.extend(todos)
-      else:
-        # 新規のリストのtodoを評価
+      if not user_todo_list.last_evaluation: 
+        # 新規作成のリストだとNullになっているので評価
         print("新規作成")
-        todos = await self.evaluation_todo_list(user_todo_list)
-        all_complete_todos.extend(todos)
-        user_todo_list.last_evaluation = datetime.datetime.now()
-        await repo.update_last_evaluation(user_todo_list)
-    return all_complete_todos
+        await self.evaluation_todo_in_list(user_todo_list)
+        user_todo_list.last_evaluation = datetime.datetime.now(tz=datetime.timezone.utc)
+        await repo.update_list(user_todo_list)
+      elif user_todo_list.updated > user_todo_list.last_evaluation:
+        # 内容に変更があるため再評価
+        print("変更有",user_todo_list)
+        await self.evaluation_todo_in_list(user_todo_list)
+        user_todo_list.last_evaluation = datetime.datetime.now(tz=datetime.timezone.utc)
+        await repo.update_list(user_todo_list)
+      else:
+        # 変更がないため評価しない
+        print("変更なし",user_todo_list)
           

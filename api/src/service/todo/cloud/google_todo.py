@@ -3,8 +3,7 @@ from googleapiclient.errors import HttpError
 import datetime
 
 from src.service.utils.google_base import GoogleBase
-from src.repository.todo_list_repository import TodoListRepository
-from src.repository.todo_repository import TodoRepository
+from src.repository.todo_list_repo import TodoListRepo
 
 from pydantic import BaseModel
 from src.domain.entities.todo_list import TodoList
@@ -41,7 +40,7 @@ class GoogleTodoService(GoogleBase, BaseModel):
         TodoList(
           id = item["id"],
           title = item["title"],
-          updated = datetime.datetime.fromisoformat(item["updated"][:-1] + '+00:00')
+          updated = datetime.datetime.fromisoformat(item["updated"][:-1] + '+00:00'),
         ) 
         for item in items
       ]
@@ -73,7 +72,8 @@ class GoogleTodoService(GoogleBase, BaseModel):
       ]
       active_todos = [todo for todo in todos if todo.status != "completed"]
       
-      todo_list.todos = active_todos
+      #TODO# ここ直接代入なくしたい
+      todo_list._todos = active_todos
       
     except HttpError as err:
       print(err)
@@ -89,7 +89,9 @@ class GoogleTodoService(GoogleBase, BaseModel):
     self.todo_lists = all_todo_lists
     
   async def do_import_to_local(self):
-    repository = TodoListRepository(session=self.session)
+    repo = TodoListRepo(session=self.session)
     for todo_list in self.todo_lists:
-      print(todo_list)
-      await repository.save(todo_list)
+      if await repo.fetch_list_by_id(todo_list.id):
+        await repo.update_list(todo_list)
+      else:
+        await repo.create_list_with_todos(todo_list)
