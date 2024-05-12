@@ -49,9 +49,10 @@ class TodoListRepo(BaseModel):
   async def fetch_user_lists_with_todos(self):
     stmt = select(TodoListModel).options(selectinload(TodoListModel.todos))
     results = await self.session.execute(stmt)
-    todo_list_models = results.scalars().all()
+    todo_list_models = results.scalars().all()  
     todo_list_entities = []
     for todo_list_model in todo_list_models:
+      #print(todo_list_model) #TODO# todo_list_model.last_evaluationがなぜかNone
       todo_models = todo_list_model.todos
       todo_list_entity = TodoListMapper.to_entity_without_todos(todo_list_model)
       todo_entities = [TodoMapper.to_entity(todo_model) for todo_model in todo_models]
