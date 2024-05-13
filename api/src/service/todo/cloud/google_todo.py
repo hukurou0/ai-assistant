@@ -72,8 +72,7 @@ class GoogleTodoService(GoogleBase, BaseModel):
       ]
       active_todos = [todo for todo in todos if todo.status != "completed"]
       
-      #TODO# ここ直接代入なくしたい
-      todo_list._todos = active_todos
+      todo_list.set_todos(active_todos)
       
     except HttpError as err:
       print(err)
