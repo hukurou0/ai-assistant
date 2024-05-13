@@ -45,7 +45,7 @@ class GoogleCalendarService(GoogleBase, BaseModel):
 
     return free_times
   
-  def _parse_event_datetime(self, event_start):
+  def _parse_event_datetime(self, event_start)->datetime:
     dt_str = event_start.get('dateTime') or event_start.get('date')
     dt = datetime.fromisoformat(dt_str)
     # タイムゾーン情報がない場合、日本のタイムゾーンを設定

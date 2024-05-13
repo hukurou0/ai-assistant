@@ -1,6 +1,9 @@
 from sqlalchemy import create_engine, Column, String, DateTime, ForeignKey, Integer
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
+from src.domain.entities.todo import Todo
+from src.domain.entities.todo_list import TodoList
+
 # データベースの接続情報
 database_url = 'postgresql://myuser:mypassword@postgres/mydatabase'
 
@@ -24,7 +27,7 @@ class TodoListModel(Base):
     last_evaluation = Column(DateTime(timezone=True))
     todos = relationship("TodoModel", back_populates="todo_list", lazy='select')
     
-    def __init__(self, todo_list_entity):
+    def __init__(self, todo_list_entity:TodoList):
         self.id       = todo_list_entity.id
         self.title    = todo_list_entity.title
         self.updated  = todo_list_entity.updated
@@ -49,7 +52,7 @@ class TodoModel(Base):
     priority = Column(Integer)
     todo_list = relationship("TodoListModel", back_populates="todos")
     
-    def __init__(self, todo_entity, todo_list_model):
+    def __init__(self, todo_entity:Todo, todo_list_model:TodoListModel):
         self.id           = todo_entity.id
         self.todo_list_id = todo_list_model.id
         self.title        = todo_entity.title

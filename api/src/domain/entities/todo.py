@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from src.domain.vos.evaluation_parms import EvaluationParmsVO
 
 class Todo(BaseModel):
   id:str
@@ -13,10 +14,10 @@ class Todo(BaseModel):
   required_time:Optional[int] = None
   priority:Optional[int] = None
     
-  def add_evaluation(self, evaluation_params):
-    self.difficulty    = evaluation_params["difficulty"]
-    self.required_time = evaluation_params["required_time"]
-    self.priority      = evaluation_params["priority"]
+  def add_evaluation(self, evaluation_params:EvaluationParmsVO):
+    self.difficulty    = evaluation_params.difficulty
+    self.required_time = evaluation_params.required_time
+    self.priority      = evaluation_params.priority
     return self
     
         

@@ -9,7 +9,7 @@ class SuggestTodoService(BaseModel):
   calendar_service:Union[GoogleCalendarService]
   todo_service:Union[LocalTodoService]
 
-  async def find_well_todos(self): 
+  async def find_well_todos(self) -> list[SuggestTodoVO]: 
     free_times = self.calendar_service.find_free_times()
     todos = await self.todo_service.fetch_todos()
 
