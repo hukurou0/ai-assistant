@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from src.service.calendar.cloud.google_calendar import GoogleCalendarService
 from src.service.todo.cloud.google_todo import GoogleTodoService
 from src.service.suggest_todo import SuggestTodoService
-from src.service.evaluation.gpt.gpt4_evaluation import GPT4EvaluationService
+from src.service.evaluation.gpt4o.gpt4o_evaluation import GPT4OEvaluationService
 from src.service.todo.cloud.sync_todo import SyncTodoService
 from src.service.todo.local_todo import LocalTodoService
 
@@ -47,10 +47,18 @@ async def read_root():
 #TODO# Google-todoでtodoのみアップデートされた時syncできるように（listのupdatedが変わらないためスキップされる）
 @app.get("/sync/google-todo")
 async def sync_google(db: AsyncSession = Depends(get_db_session)):
+    #import time
+    #start_time = time.time()
+    
     todo_service = GoogleTodoService(session = db)
-    evaluation_service = GPT4EvaluationService(session = db)
+    evaluation_service = GPT4OEvaluationService(session = db)
     sync_todo_service = SyncTodoService(todo_service=todo_service, evaluation_service=evaluation_service)
     result = await sync_todo_service.execute()
+    
+    #end_time = time.time()
+    #elapsed_time = end_time - start_time
+    #print(f"所要時間: {elapsed_time}秒")
+    
     if result == "finished":
         return {"message": "finished"}
     

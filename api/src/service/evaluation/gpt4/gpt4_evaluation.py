@@ -1,5 +1,5 @@
 from openai import OpenAI
-from src.service.evaluation.gpt import tools
+from src.service.evaluation.gpt4 import tools
 from dotenv import load_dotenv
 import os
 import datetime
