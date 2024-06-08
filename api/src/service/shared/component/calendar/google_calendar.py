@@ -5,13 +5,13 @@ import pytz
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from src.service.utils.google_base import GoogleBase
+from src.service.shared.utils.google_base import GoogleBase
 
 from pydantic import BaseModel
 from typing import List, Optional
 from src.domain.vos.free_time import FreeTimeVO
 
-class GoogleCalendarService(GoogleBase, BaseModel):
+class GoogleCalendarComponent(GoogleBase, BaseModel):
   events: Optional[List] = []
   
   #TODO# min_durationを設定できるように

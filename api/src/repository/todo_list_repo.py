@@ -21,6 +21,15 @@ class TodoListMapper:
       updated         = todo_list_model.updated,
       last_evaluation = todo_list_model.last_evaluation,
       )
+  def to_entity_with_todos(todo_list_model:TodoListModel, todo_models:list[TodoModel]) -> TodoList:
+    todo_list = TodoList(
+      id              = todo_list_model.id,
+      title           = todo_list_model.title,
+      updated         = todo_list_model.updated,
+      last_evaluation = todo_list_model.last_evaluation,
+      )
+    todo_list.set_todos([TodoMapper.to_entity(todo_model) for todo_model in todo_models])
+    return todo_list
 
 class TodoMapper:
   @staticmethod
@@ -46,6 +55,15 @@ class TodoListRepo(BaseModel):
     
   async def fetch_user_lists_without_todos(self):
     pass
+   
+  async def fetch_list_by_todo_id(self, todo_id:str) -> TodoList | None:
+    stmt = select(TodoListModel).join(TodoModel).where(TodoModel.id == todo_id).options(selectinload(TodoListModel.todos))
+    result = await self.session.execute(stmt)
+    todo_list_model = result.scalars().all()
+    if todo_list_model:
+      return TodoListMapper.to_entity_with_todos(todo_list_model[0], todo_list_model[0].todos)
+    else:
+      return None 
     
   async def fetch_user_lists_with_todos(self) -> list[TodoList]:
     stmt = select(TodoListModel).options(selectinload(TodoListModel.todos))

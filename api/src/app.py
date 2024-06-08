@@ -2,12 +2,13 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException
-from src.service.calendar.cloud.google_calendar import GoogleCalendarService
-from src.service.todo.cloud.google_todo import GoogleTodoService
+from src.service.shared.component.calendar.google_calendar import GoogleCalendarComponent
+from src.service.shared.component.todo.google_todo import GoogleTodoComponent
 from src.service.suggest_todo import SuggestTodoService
-from src.service.evaluation.gpt4o.gpt4o_evaluation import GPT4OEvaluationService
-from src.service.todo.cloud.sync_todo import SyncTodoService
-from src.service.todo.local_todo import LocalTodoService
+from src.service.shared.component.evaluation.gpt4o.gpt4o_evaluation import GPT4OEvaluationComponent
+from src.service.sync_todo import SyncTodoService
+from src.service.shared.provider.local_todo import LocalTodoProvider
+from src.service.selected_todo import SelectedTodosService 
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
@@ -50,9 +51,9 @@ async def sync_google(db: AsyncSession = Depends(get_db_session)):
     #import time
     #start_time = time.time()
     
-    todo_service = GoogleTodoService(session = db)
-    evaluation_service = GPT4OEvaluationService(session = db)
-    sync_todo_service = SyncTodoService(todo_service=todo_service, evaluation_service=evaluation_service)
+    todo_component = GoogleTodoComponent(session = db)
+    evaluation_component = GPT4OEvaluationComponent(session = db)
+    sync_todo_service = SyncTodoService(todo_component=todo_component, evaluation_component=evaluation_component)
     result = await sync_todo_service.execute()
     
     #end_time = time.time()
@@ -65,9 +66,9 @@ async def sync_google(db: AsyncSession = Depends(get_db_session)):
   
 @app.get("/find")
 async def read_root(db: AsyncSession = Depends(get_db_session)):
-    calendar_service = GoogleCalendarService()
-    todo_service = LocalTodoService(session = db)  
-    suggest_todo_service = SuggestTodoService(calendar_service=calendar_service, todo_service=todo_service)
+    calendar_component = GoogleCalendarComponent()
+    todo_provider = LocalTodoProvider(session = db)  
+    suggest_todo_service = SuggestTodoService(calendar_component=calendar_component, todo_provider=todo_provider)
     well_todos = await suggest_todo_service.find_well_todos()
     
     response_well_todos = []
@@ -90,3 +91,11 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
         response_well_todos.append(response_well_todo)
         
     return {"well_todos": response_well_todos}
+
+@app.patch("/selected-todo/add")
+async def add_selected_todo(todo_id: str = None, db: AsyncSession = Depends(get_db_session)):
+    from src.domain.vos.free_time import FreeTimeVO
+    from datetime import datetime
+    free_time = FreeTimeVO(start = datetime.now(), end = datetime.now(), duration = 10)
+    await SelectedTodosService(session = db).add_selected_todo_by_id(todo_id,free_time)
+    return {"todo_id": todo_id, "message": "success"}

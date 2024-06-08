@@ -2,7 +2,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import datetime
 
-from src.service.utils.google_base import GoogleBase
+from src.service.shared.utils.google_base import GoogleBase
 from src.repository.todo_list_repo import TodoListRepo
 
 from pydantic import BaseModel
@@ -23,7 +23,7 @@ engine = create_engine(database_url)
 """ Session = sessionmaker(bind=engine)
 session = Session() """
 
-class GoogleTodoService(GoogleBase, BaseModel):
+class GoogleTodoComponent(GoogleBase, BaseModel):
   session:Any
   todo_lists:Optional[list[TodoList]] = None
   

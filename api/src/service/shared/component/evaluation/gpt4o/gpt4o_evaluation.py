@@ -1,5 +1,5 @@
 from openai import OpenAI
-from src.service.evaluation.gpt4 import tools
+from src.service.shared.component.evaluation.gpt4o import tools
 from dotenv import load_dotenv
 import os
 import datetime
@@ -14,7 +14,7 @@ from src.domain.vos.evaluation_parms import EvaluationParmsVO
 
 load_dotenv()
 
-class GPT4EvaluationService(BaseModel):
+class GPT4OEvaluationComponent(BaseModel):
   session:Any
   
   #TODO# Noneの時に再リクエス処理(回数制限やモデル変えるなど)
@@ -28,7 +28,7 @@ class GPT4EvaluationService(BaseModel):
       content += f"\n\
         Notes:{todo.notes}"
 
-    model = "gpt-4-turbo-preview"
+    model = "gpt-4o-2024-05-13"
 
     client = OpenAI(api_key=os.getenv("API_KEY"))
 

@@ -1,17 +1,17 @@
-from src.service.calendar.cloud.google_calendar import GoogleCalendarService
-from src.service.todo.local_todo import LocalTodoService
+from src.service.shared.component.calendar.google_calendar import GoogleCalendarComponent
+from src.service.shared.provider.local_todo import LocalTodoProvider
 
 from typing import Union
 from pydantic import BaseModel
 from src.domain.vos.suggest_todo import SuggestTodoVO
 
 class SuggestTodoService(BaseModel):
-  calendar_service:Union[GoogleCalendarService]
-  todo_service:Union[LocalTodoService]
+  calendar_component:Union[GoogleCalendarComponent]
+  todo_provider:Union[LocalTodoProvider]
 
   async def find_well_todos(self) -> list[SuggestTodoVO]: 
-    free_times = self.calendar_service.find_free_times()
-    todos = await self.todo_service.fetch_todos()
+    free_times = self.calendar_component.find_free_times()
+    todos = await self.todo_provider.fetch_todos()
 
     well_todos:list[SuggestTodoVO] = []
     for free_time in free_times:

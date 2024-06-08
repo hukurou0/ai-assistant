@@ -1,21 +1,9 @@
+from src.models.make_base import Base
 from sqlalchemy import create_engine, Column, String, DateTime, ForeignKey, Integer
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
 from src.domain.entities.todo import Todo
 from src.domain.entities.todo_list import TodoList
-
-# データベースの接続情報
-database_url = 'postgresql://myuser:mypassword@postgres/mydatabase'
-
-# エンジンの作成
-engine = create_engine(database_url)
-
-# セッションの作成
-Session = sessionmaker(bind=engine)
-session = Session()
-
-# Baseクラスの作成
-Base = declarative_base()
 
 # テーブルの定義
 class TodoListModel(Base):
@@ -36,6 +24,8 @@ class TodoListModel(Base):
     def __repr__(self):
         return f"<TodoList(id={self.id}, title='{self.title}', updated='{self.updated}', last_evaluation='{self.last_evaluation}')>"
 
+from src.models.selected_todos import SelectedTodosModel
+
 class TodoModel(Base):
     __tablename__ = 'todo'
 
@@ -51,6 +41,7 @@ class TodoModel(Base):
     required_time = Column(Integer)
     priority = Column(Integer)
     todo_list = relationship("TodoListModel", back_populates="todos")
+    selected_todos = relationship("SelectedTodosModel", back_populates="todo", lazy='select')
     
     def __init__(self, todo_entity:Todo, todo_list_model:TodoListModel):
         self.id           = todo_entity.id
@@ -68,9 +59,3 @@ class TodoModel(Base):
 
     def __repr__(self):
         return f"<Todo(id={self.id}, title='{self.title}')>"
-
-# テーブルの作成
-Base.metadata.create_all(engine)
-
-# セッションのクローズ
-session.close()
