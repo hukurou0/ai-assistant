@@ -2,7 +2,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import datetime
 
-from src.service.shared.utils.google_base import GoogleBase
+from src.repository.shared.google_base import GoogleBase
 from src.repository.todo_list_repo import TodoListRepo
 
 from pydantic import BaseModel

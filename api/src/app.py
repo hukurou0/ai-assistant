@@ -9,6 +9,7 @@ from src.service.shared.component.evaluation.gpt4o.gpt4o_evaluation import GPT4O
 from src.service.sync_todo import SyncTodoService
 from src.service.shared.provider.local_todo import LocalTodoProvider
 from src.service.selected_todo import SelectedTodosService 
+from src.service.schedule import ScheduleService
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
@@ -99,3 +100,8 @@ async def add_selected_todo(todo_id: str = None, db: AsyncSession = Depends(get_
     free_time = FreeTimeVO(start = datetime.now(), end = datetime.now(), duration = 10)
     await SelectedTodosService(session = db).add_selected_todo_by_id(todo_id,free_time)
     return {"todo_id": todo_id, "message": "success"}
+
+@app.get("/schedule")
+async def get_schedule(db: AsyncSession = Depends(get_db_session)):
+    schedule = await ScheduleService(session = db).sync()
+    return {"schedule": schedule}

@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from src.models.make_base import Base
 from src.models.selected_todos import SelectedTodosModel
 from src.models.todo_list_model import TodoListModel, TodoModel
+from src.models.free_time_model import FreeTimeModel
 
 # データベースの接続情報
 database_url = 'postgresql://myuser:mypassword@postgres/mydatabase'

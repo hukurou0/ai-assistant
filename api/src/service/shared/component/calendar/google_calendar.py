@@ -5,7 +5,7 @@ import pytz
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from src.service.shared.utils.google_base import GoogleBase
+from src.repository.shared.google_base import GoogleBase
 
 from pydantic import BaseModel
 from typing import List, Optional
