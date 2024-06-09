@@ -10,6 +10,7 @@ services:
       POSTGRES_PASSWORD: mypassword
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./db/postgresql.conf:/etc/postgresql/postgresql.conf
     ports:
       - '5432:5432'
 
