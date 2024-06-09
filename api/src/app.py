@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from fastapi import FastAPI, Depends, HTTPException
+import yaml
 from src.service.shared.component.calendar.google_calendar import GoogleCalendarComponent
 from src.service.shared.component.todo.google_todo import GoogleTodoComponent
 from src.service.suggest_todo import SuggestTodoService
@@ -34,6 +35,18 @@ async_session = sessionmaker(
 
 # FastAPI アプリケーション
 app = FastAPI()
+
+# OpenAPIの仕様をファイルから読み込む
+with open("./doc/v1.0.0.yaml", "r") as file:
+    openapi_schema = yaml.safe_load(file)
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
 
 # 依存関係
 async def get_db_session() -> AsyncSession:

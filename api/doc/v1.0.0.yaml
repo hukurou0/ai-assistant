@@ -1,0 +1,109 @@
+openapi: 3.0.0
+info:
+  title: Todo Suggestion API
+  version: 1.0.0
+paths:
+  /suggest:
+    get:
+      summary: 特定の空き時間に対しての推奨todoを取得する
+      parameters:
+        - in: query
+          name: free_time_id
+          required: true
+          schema:
+            type: string
+          description: 空き時間のID
+      responses:
+        '200':
+          description: 推奨todosのリスト
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggest_todos:
+                    type: object
+                    properties:
+                      free_time_id:
+                        type: string
+                      todos:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            title:
+                              type: string
+                            required_time:
+                              type: integer
+                            note:
+                              type: string
+
+  /selected-todo/add:
+    patch:
+      summary: 推奨todosのうち、ユーザの選択したtodoを実際に行うtodosに追加する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                free_time_id:
+                  type: string
+                todo_id:
+                  type: string
+      responses:
+        '200':
+          description: 成功時のレスポンス
+
+  /selected-todo/remove:
+    patch:
+      summary: 推奨todosのうち、ユーザの選択したtodoを実際に行うtodosから除外する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                free_time_id:
+                  type: string
+                todo_id:
+                  type: string
+      responses:
+        '200':
+          description: 成功時のレスポンス
+
+  /schedule:
+    get:
+      summary: カレンダーの予定とその空き時間に対して選んだtodoを取得する
+      responses:
+        '200':
+          description: スケジュールのリスト
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schedule:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          enum: [event, free_time]
+                        id:
+                          type: string
+                        summary:
+                          type: string
+                        description:
+                          type: string
+                        start:
+                          type: string
+                          format: date-time
+                        end:
+                          type: string
+                          format: date-time
