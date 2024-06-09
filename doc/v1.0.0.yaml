@@ -41,7 +41,7 @@ paths:
                                   title:
                                     type: string
                                   required_time:
-                                    type: string
+                                    type: integer
                                   note:
                                     type: string
 
@@ -102,18 +102,25 @@ paths:
                     items:
                       type: object
                       properties:
+                        type:
+                          type: string
+                          enum: [event, free_time]
+                        id:
+                          type: string
+                        summary:
+                          type: string
+                          nullable: true
+                        description:
+                          type: string
+                          nullable: true
                         start:
                           type: string
                           format: date-time
                         end:
                           type: string
                           format: date-time
-                        title:
-                          type: string
-                        note:
-                          type: string
-                        todo:
-                          type: boolean
-                        required_time:
-                          type: integer
-                          nullable: true
+                      required:
+                        - type
+                        - id
+                        - start
+                        - end

@@ -9,6 +9,7 @@ from typing import Any
 from src.domain.entities.free_time import FreeTime
 
 from datetime import datetime
+import pytz
 
 class FreeTimeMapper:
   @staticmethod
@@ -20,17 +21,20 @@ class FreeTimeMapper:
     )
   
   def to_entity(free_time_model:FreeTimeModel) -> FreeTime:
+    tz_tokyo = pytz.timezone('Asia/Tokyo')
     return FreeTime(
       id    = free_time_model.id,
-      start = free_time_model.start,
-      end   = free_time_model.end,
+      start = free_time_model.start.astimezone(tz_tokyo),
+      end   = free_time_model.end.astimezone(tz_tokyo),
       )
 
 class FreeTimeRepo(BaseModel):
   session:Any
   
   async def fetch(self)-> list[FreeTime]:
-    stmt = select(FreeTimeModel).where(FreeTimeModel.start >= datetime.now())
+    tz_tokyo = pytz.timezone('Asia/Tokyo')
+    today_start = datetime.now(tz_tokyo).replace(hour=0, minute=0, second=0, microsecond=0)
+    stmt = select(FreeTimeModel).where(FreeTimeModel.start >= today_start)
     result = await self.session.execute(stmt)
     free_time_models = result.scalars().all()
     if free_time_models:
