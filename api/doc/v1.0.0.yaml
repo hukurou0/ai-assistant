@@ -21,24 +21,34 @@ paths:
               schema:
                 type: object
                 properties:
+                  free_time_id:
+                    type: string
                   suggest_todos:
-                    type: object
-                    properties:
-                      free_time_id:
-                        type: string
-                      todos:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                            title:
-                              type: string
-                            required_time:
-                              type: integer
-                            note:
-                              type: string
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        title:
+                          type: string
+                        required_time:
+                          type: integer
+                        note:
+                          type: string
+                  selected_todos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        title:
+                          type: string
+                        required_time:
+                          type: integer
+                        note:
+                          type: string
 
   /selected-todo/add:
     patch:
