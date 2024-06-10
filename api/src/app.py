@@ -78,35 +78,45 @@ async def sync_google(db: AsyncSession = Depends(get_db_session)):
     
     if result == "finished":
         return {"message": "finished"}
-    
-  
-@app.get("/find")
-async def read_root(db: AsyncSession = Depends(get_db_session)):
+
+@app.get("/suggest")
+async def suggest(free_time_id:str = None, db: AsyncSession = Depends(get_db_session)):
     calendar_component = GoogleCalendarComponent()
     todo_provider = LocalTodoProvider(session = db)  
     suggest_todo_service = SuggestTodoService(calendar_component=calendar_component, todo_provider=todo_provider)
-    well_todos = await suggest_todo_service.find_well_todos()
+    suggest_todos = await suggest_todo_service.find_well_todos()
     
-    response_well_todos = []
-    for well_todo in well_todos:
-        free_time = well_todo.free_time
-        todo = well_todo.todo
-        
-        response_well_todo = {
-            "free_time":{
-                "start":free_time.start,
-                "end":free_time.end,
-                "duration":free_time.duration
-            },
-            "todo":{
-                "title":todo.title,
-                "required_time":todo.required_time,
-                "difficulty":todo.difficulty
+    selected_todos = await SelectedTodosService(session = db).get_selected_todos_by_free_time_id(free_time_id)
+    
+    response_suggest_todos = []
+    for suggest_todo in suggest_todos:
+        response_suggest_todos.append(
+            {
+                "id"           : suggest_todo.todo.id,
+                "title"        : suggest_todo.todo.title,
+                "required_time": suggest_todo.todo.required_time,
+                "notes"        : suggest_todo.todo.notes
             }
-        }
-        response_well_todos.append(response_well_todo)
+        )
         
-    return {"well_todos": response_well_todos}
+    response_selected_todos = []
+    for selected_todo in selected_todos:
+        response_selected_todos.append(
+            {
+                "id"           : selected_todo.id,
+                "title"        : selected_todo.title,
+                "required_time": selected_todo.required_time,
+                "notes"        : selected_todo.notes
+            }
+        )
+        
+    response = {
+        "free_time_id":free_time_id,
+        "suggest_todos":response_suggest_todos,
+        "selected_todos":response_selected_todos
+    }
+        
+    return response
     
 @app.patch("/selected-todo/add")
 async def add_selected_todo(request_body:request_params.SelectedTodoAddParams, db: AsyncSession = Depends(get_db_session)):

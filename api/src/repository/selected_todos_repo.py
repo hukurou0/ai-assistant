@@ -56,6 +56,34 @@ class SelectedTodosRepo(BaseModel):
       return await self.fetch_by_date(date = today_start)
     else:
       return None
+    
+  async def fetch_by_free_time_id(self, free_time_id:str) -> SelectedTodos:
+    stmt = (
+      select(SelectedTodosModel)
+      .where(SelectedTodosModel.free_time_id == free_time_id)
+      .options(joinedload(SelectedTodosModel.todo),
+              joinedload(SelectedTodosModel.free_time))
+    )
+    result = await self.session.execute(stmt)
+    selected_todos_models = result.scalars().all()
+    if selected_todos_models:
+      return SelectedTodosMapper.to_entity(selected_todos_models)
+    else:
+      return None
+    
+  async def fetch_by_free_time_id(self, free_time_id:str) -> SelectedTodos:
+    stmt = (
+      select(SelectedTodosModel)
+      .where(SelectedTodosModel.free_time_id == free_time_id)
+      .options(joinedload(SelectedTodosModel.todo),
+              joinedload(SelectedTodosModel.free_time))
+    )
+    result = await self.session.execute(stmt)
+    selected_todos_models = result.scalars().all()
+    if selected_todos_models:
+      return SelectedTodosMapper.to_entity(selected_todos_models)
+    else:
+      return None
       
   async def save(self, selected_todos:SelectedTodos):
     if not(selected_todos.add_todos) and not(selected_todos.delete_todos):

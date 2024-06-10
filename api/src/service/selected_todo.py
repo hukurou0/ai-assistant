@@ -44,3 +44,12 @@ class SelectedTodosService(BaseModel):
       return "Not Found SelectedTodo"
     else:
       return "Not Found SelectedTodos"
+    
+  async def get_selected_todos_by_free_time_id(self, free_time_id:str) -> list[Todo]:
+    select_todos_repo = SelectedTodosRepo(session = self.session)
+    selected_todos = await select_todos_repo.fetch_by_free_time_id(free_time_id)
+    if selected_todos:
+      todos = [selected_todo.todo for selected_todo in selected_todos.get_todos()]
+      return todos
+    else:
+      return None
