@@ -12,6 +12,8 @@ from src.service.shared.provider.local_todo import LocalTodoProvider
 from src.service.selected_todo import SelectedTodosService 
 from src.service.schedule import ScheduleService
 
+from src.const import request_params 
+
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
 
@@ -105,14 +107,11 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
         response_well_todos.append(response_well_todo)
         
     return {"well_todos": response_well_todos}
-
+    
 @app.patch("/selected-todo/add")
-async def add_selected_todo(todo_id: str = None, db: AsyncSession = Depends(get_db_session)):
-    from src.domain.vos.free_time import FreeTimeVO
-    from datetime import datetime
-    free_time = FreeTimeVO(start = datetime.now(), end = datetime.now(), duration = 10)
-    await SelectedTodosService(session = db).add_selected_todo_by_id(todo_id,free_time)
-    return {"todo_id": todo_id, "message": "success"}
+async def add_selected_todo(request_body:request_params.SelectedTodoAddParams, db: AsyncSession = Depends(get_db_session)):
+    await SelectedTodosService(session = db).add_selected_todo_by_id(request_body.todo_id,request_body.free_time_id)
+    return {"todo_id": request_body.todo_id, "message": "success"}
 
 @app.get("/schedule")
 async def get_schedule(db: AsyncSession = Depends(get_db_session)):

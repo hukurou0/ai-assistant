@@ -10,6 +10,8 @@ class FreeTimeModel(Base):
     start = Column(DateTime(timezone=True))
     end   = Column(DateTime(timezone=True))
     
+    selected_todos = relationship("SelectedTodosModel", back_populates="free_time", lazy='select')
+    
     def __init__(self, id, start, end):
       self.id    = id
       self.start = start

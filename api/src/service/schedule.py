@@ -58,6 +58,6 @@ class ScheduleService(BaseModel):
     calendar_repo = CalendarRepo(session=self.session)
     free_time_repo = FreeTimeRepo(session=self.session)
     events = await calendar_repo.get()
-    free_times = await free_time_repo.fetch()
+    free_times = await free_time_repo.fetch_today()
     schedule = Schedule(id=make_uuid(), events=events, free_times=free_times)
     return schedule

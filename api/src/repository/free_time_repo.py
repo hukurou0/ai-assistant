@@ -31,7 +31,7 @@ class FreeTimeMapper:
 class FreeTimeRepo(BaseModel):
   session:Any
   
-  async def fetch(self)-> list[FreeTime]:
+  async def fetch_today(self)-> list[FreeTime]:
     tz_tokyo = pytz.timezone('Asia/Tokyo')
     today_start = datetime.now(tz_tokyo).replace(hour=0, minute=0, second=0, microsecond=0)
     stmt = select(FreeTimeModel).where(FreeTimeModel.start >= today_start)
@@ -47,3 +47,12 @@ class FreeTimeRepo(BaseModel):
       free_time_model = FreeTimeMapper.to_model(free_time)
       self.session.add(free_time_model)
     await self.session.commit()
+    
+  async def fetch_by_id(self, id:str) -> FreeTime:
+    stmt = select(FreeTimeModel).where(FreeTimeModel.id == id)
+    result = await self.session.execute(stmt)
+    free_time_model = result.scalars().first()
+    if free_time_model:
+      return FreeTimeMapper.to_entity(free_time_model)
+    else:
+      return None

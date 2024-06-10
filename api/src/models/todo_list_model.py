@@ -24,8 +24,6 @@ class TodoListModel(Base):
     def __repr__(self):
         return f"<TodoList(id={self.id}, title='{self.title}', updated='{self.updated}', last_evaluation='{self.last_evaluation}')>"
 
-from src.models.selected_todos import SelectedTodosModel
-
 class TodoModel(Base):
     __tablename__ = 'todo'
 
@@ -40,6 +38,7 @@ class TodoModel(Base):
     difficulty = Column(Integer)
     required_time = Column(Integer)
     priority = Column(Integer)
+    
     todo_list = relationship("TodoListModel", back_populates="todos")
     selected_todos = relationship("SelectedTodosModel", back_populates="todo", lazy='select')
     
