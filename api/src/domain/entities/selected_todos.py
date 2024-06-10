@@ -17,12 +17,12 @@ class SelectedTodos(BaseModel):
     self._todos = todos
   
   def get_todos(self):
-    if self.add_todos or self.update_todos or self.delete_todos:
+    if self.add_todos or self.delete_todos:
       raise Exception('保存されていないaddまたはupdate、deleteがあります。repositoryで保存後todosにアクセスしてください')
     return self._todos
         
   def __str__(self):
-    if self.add_todos or self.update_todos or self.delete_todos:
+    if self.add_todos or self.delete_todos:
       raise Exception('保存されていないaddまたはupdate、deleteがあります。repositoryで保存後printを実行してください')
     return f"date:{self.date}, todos:{self.get_todos()}"
   

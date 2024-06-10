@@ -29,6 +29,18 @@ class SelectedTodosService(BaseModel):
     free_time = await free_time_repo.fetch_by_id(free_time_id)
     selected_todo = SelectedTodo(id = make_uuid(), free_time = free_time, todo = todo)
     selected_todos.add_todo(selected_todo)
-    print(selected_todos.add_todos)
     await select_todos_repo.save(selected_todos)
     return "success"
+  
+  async def delete_selected_todo_by_id(self, todo_id:str, free_time_id:str):
+    select_todos_repo = SelectedTodosRepo(session = self.session)
+    selected_todos = await select_todos_repo.get_today_selected_todos()
+    if selected_todos:
+      for selected_todo in selected_todos.get_todos():
+        if selected_todo.todo.id == todo_id and selected_todo.free_time.id == free_time_id:
+          selected_todos.delete_todo(selected_todo)
+          await select_todos_repo.save(selected_todos)
+          return "success"
+      return "Not Found SelectedTodo"
+    else:
+      return "Not Found SelectedTodos"

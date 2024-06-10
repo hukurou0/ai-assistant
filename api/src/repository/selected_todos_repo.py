@@ -74,7 +74,14 @@ class SelectedTodosRepo(BaseModel):
       selected_todos.add_todos = []
     
     if selected_todos.delete_todos:
-      for delete_todo in selected_todos.delete_todos: # 未実装
-        raise
-        stmt = delete(SelectedTodosModel).where(SelectedTodosModel.id == selected_todos.id)
-        selected_todos.delete_todos = []
+      for delete_todo in selected_todos.delete_todos:
+        stmt = delete(SelectedTodosModel).where(SelectedTodosModel.id == delete_todo.id)
+        await self.session.execute(stmt)
+        await self.session.commit()
+      selected_todos.delete_todos = []
+        
+  async def delete_todo_by_id(self, selected_todo_id:str):
+    stmt = delete(SelectedTodosModel).where(SelectedTodosModel.id == selected_todo_id)
+    await self.session.execute(stmt)
+    await self.session.commit()
+    return "success"

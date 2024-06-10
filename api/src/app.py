@@ -110,8 +110,15 @@ async def read_root(db: AsyncSession = Depends(get_db_session)):
     
 @app.patch("/selected-todo/add")
 async def add_selected_todo(request_body:request_params.SelectedTodoAddParams, db: AsyncSession = Depends(get_db_session)):
-    await SelectedTodosService(session = db).add_selected_todo_by_id(request_body.todo_id,request_body.free_time_id)
-    return {"todo_id": request_body.todo_id, "message": "success"}
+    message = await SelectedTodosService(session = db).add_selected_todo_by_id(request_body.todo_id,request_body.free_time_id)
+    if message == "success":
+        return {"todo_id": request_body.todo_id, "message": "success"}
+
+@app.patch("/selected-todo/remove")
+async def remove_selected_todo(request_body:request_params.SelectedTodoRemoveParams, db: AsyncSession = Depends(get_db_session)):
+    message = await SelectedTodosService(session = db).delete_selected_todo_by_id(request_body.todo_id,request_body.free_time_id)
+    if message == "success":
+        return {"todo_id": request_body.todo_id, "message": "success"}
 
 @app.get("/schedule")
 async def get_schedule(db: AsyncSession = Depends(get_db_session)):
