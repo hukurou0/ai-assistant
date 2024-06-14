@@ -1,5 +1,3 @@
-import Image from 'next/image'
-
 export default function Home() {
-  return <main className='bg-blue-500'>Main</main>
+  return <h1 className='text-gray-900'>Main</h1>
 }
