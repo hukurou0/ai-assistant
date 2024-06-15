@@ -1,16 +1,48 @@
 import NextAuth from 'next-auth'
-
 import GoogleProvider from 'next-auth/providers/google'
+import axios from 'axios'
 
 const authOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_OAUTH_ID || '',
-      clientSecret: process.env.GOOGLE_OAUTH_SECRET || '',
-    }),
+    GoogleProvider(
+      {
+        clientId: process.env.GOOGLE_OAUTH_ID || '',
+        clientSecret: process.env.GOOGLE_OAUTH_SECRET || '',
+        authorization: {
+          params: {
+            // scope: 'openid profile email https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks',
+            scope: 'openid profile email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      },   
+    ),
   ],
-  app: {
-    signIn: '/auth/signin',
+  callbacks: {
+    async signIn({ account }: { account: any }) {
+      if (account && account.provider === 'google') {
+        const data = {
+          access_token: account.access_token,
+          refresh_token: account.refresh_token,
+        }
+        try {
+          const response = await axios.post('http://localhost:8000/signin', data,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          return response.data
+        } catch (error) {
+          console.error('Error sending token:', error)
+          return false
+        }
+      }
+    },
+  },
+  pages: {
+    signIn: '/auth/signin', // SignInページのカスタマイズ
   },
 }
 

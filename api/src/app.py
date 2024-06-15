@@ -111,3 +111,9 @@ async def get_schedule(db: AsyncSession = Depends(get_db_session)):
                 "end"  :sorted_element.end,
             })
     return {"schedule": response_schedule}
+
+@app.post("/signin")
+async def signin(request_body:request_params.SigninParams, db: AsyncSession = Depends(get_db_session)):
+    print(request_body.access_token)
+    print(request_body.refresh_token)
+    return {"message": "success"}

@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import yaml
 
 # データベース設定
@@ -26,6 +27,20 @@ async_session = sessionmaker(
 
 # FastAPI アプリケーション
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",  # React/Next.jsアプリのオリジン
+    # 他の許可するオリジンを追加できます
+]
+
+# CORSミドルウェアを追加
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # 許可するオリジン
+    allow_credentials=True,
+    allow_methods=["*"],  # 許可するHTTPメソッド
+    allow_headers=["*"],  # 許可するHTTPヘッダー
+)
 
 # OpenAPIの仕様をファイルから読み込む
 with open("./doc/v1.0.0.yaml", "r") as file:
