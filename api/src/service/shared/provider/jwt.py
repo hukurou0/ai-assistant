@@ -3,6 +3,9 @@ from pydantic import BaseModel
 import jwt
 import os
 
+#TODO# #MUST#  トークンに有効期限を設定する
+# リフレッシュトークンの有効期限を長めに設定する
+# リフレッシュトークンが使用されるたびに新しいリフレッシュトークンを発行し、古いトークンを無効にする
 class JWTProvider(BaseModel):
   async def get_jwt_from_user_id(self, user_id:str) -> str:
     payload = {
