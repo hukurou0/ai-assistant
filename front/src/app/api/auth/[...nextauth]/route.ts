@@ -26,7 +26,7 @@ const authOptions = {
           refresh_token: account.refresh_token,
         }
         try {
-          const response = await axios.post('http://localhost:8000/signin', data,
+          const response = await axios.post('http://localhost:8000/signup', data,
           {
             headers: {
               'Content-Type': 'application/json'

@@ -10,6 +10,7 @@ from src.service.sync_todo import SyncTodoService
 from src.service.shared.provider.local_todo import LocalTodoProvider
 from src.service.selected_todo import SelectedTodosService 
 from src.service.schedule import ScheduleService
+from src.service.user import UserService
 
 from src.const import request_params 
 
@@ -112,8 +113,16 @@ async def get_schedule(db: AsyncSession = Depends(get_db_session)):
             })
     return {"schedule": response_schedule}
 
-@app.post("/signin")
-async def signin(request_body:request_params.SigninParams, db: AsyncSession = Depends(get_db_session)):
-    print(request_body.access_token)
-    print(request_body.refresh_token)
-    return {"message": "success"}
+@app.post("/signup")
+async def signup(request_body:request_params.SigninParams, db: AsyncSession = Depends(get_db_session)):
+    user_service = UserService(session = db)
+    token = await user_service.signup(access_token = request_body.access_token, refresh_token=request_body.refresh_token)
+    print(token)
+    return {"token": token}
+
+@app.get("/check")
+async def check():
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTA3ODA0MDg1Njk5NjI4ODg4NTg5In0.Vu9PjOAGDmF5XjWZwg4l5UpdTcUYjzoEkHtSj1qq_PE"
+    from src.service.shared.provider.jwt import JWTProvider
+    user_id = await JWTProvider().get_user_id_from_token(token)
+    print(user_id)
