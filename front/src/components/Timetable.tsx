@@ -1,78 +1,50 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-// import { Today } from './Today' // Assuming Today is a component
+import { useEffect, useState } from 'react'
+import data from '../../data/mock.json'
 
 type Event = {
+  type: string
   id: string
+  summary?: string
+  description?: string
   start: string
   end: string
-  type: string
 }
 
 type TimeSlotProps = {
   start: string
   end: string
-  type: string
+  type?: string
 }
 
 export default function Timetable() {
   const [schedule, setSchedule] = useState<Event[]>([])
 
   useEffect(() => {
-    const mockData = {
-      schedule: [
-        {
-          type: 'event',
-          id: '1',
-          summary: 'Event 1',
-          description: 'Description for Event 1',
-          start: '10:00',
-          end: '11:00',
-        },
-        {
-          type: 'free_time',
-          id: '2',
-          start: '11:00',
-          end: '14:00',
-        },
-        {
-          type: 'event',
-          id: '3',
-          summary: 'Event 2',
-          description: 'Description for Event 2',
-          start: '14:00',
-          end: '16:30',
-        },
-      ],
-    }
-    setSchedule(mockData.schedule)
+    setSchedule(data)
   }, [])
 
-  const hours = Array.from({ length: 16 }, (_, i) => i + 7) // 7시부터 22시까지
-
-  const timeSlots = hours.map(hour => ({
-    start: `${hour}:00`,
-    end: `${hour + 1}:00`,
-    type: 'empty',
+  const hours = Array.from({ length: 16 }, (v, i) => ({
+    start: `${(i + 7).toString().padStart(2, '0')}:00`,
+    end: `${(i + 8).toString().padStart(2, '0')}:00`,
+    type: 'free_time',
   }))
 
-  const mappedSchedule = timeSlots.map(slot => {
+  const mappedSchedule = hours.map(hour => {
     const event = schedule.find(event => {
       const eventStart = parseInt(event.start.split(':')[0])
       const eventEnd = parseInt(event.end.split(':')[0])
-      const slotHour = parseInt(slot.start.split(':')[0])
+      const hourStart = parseInt(hour.start.split(':')[0])
 
-      return slotHour >= eventStart && slotHour < eventEnd
+      return hourStart >= eventStart && hourStart < eventEnd
     })
 
-    return event ? { ...slot, ...event } : slot
+    return event ? { ...hour, type: event.type } : hour
   })
 
   return (
     <div className='flex flex-col items-center justify-center'>
-      {/* <Today /> */}
-
       {mappedSchedule.map((item, index) => (
         <TimeSlot
           key={index}
@@ -84,15 +56,14 @@ export default function Timetable() {
     </div>
   )
 }
-
 function TimeSlot({ start, end, type }: TimeSlotProps) {
   return (
     <div
-      className={`w-full border-b border-gray-300 py-2 ${
-        type === 'event' ? 'bg-blue-500' : 'bg-gray-200'
+      className={`w-full border-b border-gray-300 py-2 h-32 ${
+        type === 'event' ? 'bg-blue-500' : 'bg-white-100'
       }`}
     >
-      {start} - {end}
+      <p className='text-xl'>{start}</p>
     </div>
   )
 }
