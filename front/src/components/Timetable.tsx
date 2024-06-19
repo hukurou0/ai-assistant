@@ -59,7 +59,7 @@ export default function Timetable() {
 function TimeSlot({ start, end, type }: TimeSlotProps) {
   return (
     <div
-      className={`w-full border-b border-gray-300 py-2 h-32 ${
+      className={`w-full border-b border-gray-300 py-2 h-24 ${
         type === 'event' ? 'bg-blue-500' : 'bg-white-100'
       }`}
     >
