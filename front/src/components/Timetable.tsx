@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import data from '../../data/mock.json'
+import { TimeSlot } from './TimetableSlot'
 
 type Event = {
   type: string
@@ -10,12 +11,6 @@ type Event = {
   description?: string
   start: string
   end: string
-}
-
-type TimeSlotProps = {
-  start: string
-  end: string
-  type?: string
 }
 
 export default function Timetable() {
@@ -53,17 +48,6 @@ export default function Timetable() {
           type={item.type}
         />
       ))}
-    </div>
-  )
-}
-function TimeSlot({ start, end, type }: TimeSlotProps) {
-  return (
-    <div
-      className={`w-full border-b border-gray-300 py-2 h-24 ${
-        type === 'event' ? 'bg-blue-500' : 'bg-white-100'
-      }`}
-    >
-      <p className='text-xl'>{start}</p>
     </div>
   )
 }
