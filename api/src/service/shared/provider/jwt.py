@@ -1,7 +1,16 @@
+from fastapi import HTTPException
+
+
 from pydantic import BaseModel
+from typing import Dict
 
 import jwt
 import os
+import datetime
+import pytz
+
+ACCESS_TOKEN_EXPIRES_MINUTES = 15
+REFRESH_TOKEN_EXPIRES_DAYS = 7
 
 #TODO# #MUST#  トークンに有効期限を設定する
 # リフレッシュトークンの有効期限を長めに設定する
@@ -11,8 +20,13 @@ class JWTProvider(BaseModel):
     payload = {
         'user_id': user_id,
     }
-    token = jwt.encode(payload, os.getenv("JWT_SECRET_KEY"), algorithm='HS256')
-    return token
+    tz_tokyo = pytz.timezone('Asia/Tokyo')
+    now = datetime.datetime.now(tz_tokyo)
+    expiration = now + datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRES_MINUTES)
+    access_token = jwt.encode({'exp': expiration, **payload}, os.getenv("JWT_SECRET_KEY"), algorithm='HS256')
+    expiration = now + datetime.timedelta(days=REFRESH_TOKEN_EXPIRES_DAYS)
+    refresh_token = jwt.encode({'exp': expiration, **payload}, os.getenv("JWT_SECRET_KEY"), algorithm='HS256')
+    return {"access_token": access_token, "refresh_token": refresh_token}
   
   async def get_user_id_from_token(self, token) -> str:
     try:
@@ -22,3 +36,12 @@ class JWTProvider(BaseModel):
         return None  # トークンの有効期限が切れている場合
     except jwt.InvalidTokenError:
         return None  # トークンが無効な場合
+      
+  async def decode_jwt(token: str) -> Dict:
+    try:
+      payload = jwt.decode(token, os.getenv("JWT_SECRET_KEY"), algorithms=['HS256'])
+      return payload
+    except jwt.ExpiredSignatureError:
+      raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+      raise HTTPException(status_code=401, detail="Invalid token")

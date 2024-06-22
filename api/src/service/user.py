@@ -22,5 +22,5 @@ class UserService(BaseModel):
       )
     repo = UserRepo(session=self.session)
     await repo.save(user)
-    token = await JWTProvider().get_jwt_from_user_id(user.id)
-    return token
+    tokens = await JWTProvider().get_jwt_from_user_id(user.id)
+    return tokens

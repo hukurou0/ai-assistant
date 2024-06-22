@@ -1,4 +1,4 @@
-from src.app_setting import app, get_db_session
+from src.app_setting import app, get_db_session, get_current_user_id
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 
@@ -116,13 +116,10 @@ async def get_schedule(db: AsyncSession = Depends(get_db_session)):
 @app.post("/signup")
 async def signup(request_body:request_params.SigninParams, db: AsyncSession = Depends(get_db_session)):
     user_service = UserService(session = db)
-    token = await user_service.signup(access_token = request_body.access_token, refresh_token=request_body.refresh_token)
-    print(token)
-    return {"token": token}
+    tokens = await user_service.signup(access_token = request_body.access_token, refresh_token=request_body.refresh_token)
+    return {"access_token": tokens["access_token"], "refresh_token": tokens["refresh_token"]}
 
 @app.get("/check")
-async def check():
+async def check(user_id:str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db_session)):
     token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTA3ODA0MDg1Njk5NjI4ODg4NTg5In0.Vu9PjOAGDmF5XjWZwg4l5UpdTcUYjzoEkHtSj1qq_PE"
-    from src.service.shared.provider.jwt import JWTProvider
-    user_id = await JWTProvider().get_user_id_from_token(token)
-    print(user_id)
+    user = await UserService(session = db).get_user_by_id(user_id)

@@ -1,8 +1,11 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import yaml
+
+from src.service.shared.provider.jwt import JWTProvider
 
 # データベース設定
 DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
@@ -27,6 +30,7 @@ async_session = sessionmaker(
 
 # FastAPI アプリケーション
 app = FastAPI()
+security = HTTPBearer()
 
 origins = [
     "http://localhost:3000",  # React/Next.jsアプリのオリジン
@@ -58,3 +62,8 @@ app.openapi = custom_openapi
 async def get_db_session() -> AsyncSession:
     async with async_session() as session:
         yield session
+        
+async def get_current_user_id(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    token = credentials.credentials
+    payload = await JWTProvider.decode_jwt(token)
+    return payload["user_id"]        
