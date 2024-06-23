@@ -3,9 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 
 from src.service.shared.component.calendar.google_calendar import GoogleCalendarComponent
-from src.service.shared.component.todo.google_todo import GoogleTodoComponent
 from src.service.suggest_todo import SuggestTodoService
-from src.service.shared.component.evaluation.gpt4o.gpt4o_evaluation import GPT4OEvaluationComponent
 from src.service.sync_todo import SyncTodoService
 from src.service.shared.provider.local_todo import LocalTodoProvider
 from src.service.selected_todo import SelectedTodosService 
@@ -26,9 +24,7 @@ async def sync_google(db: AsyncSession = Depends(get_db_session)):
     #import time
     #start_time = time.time()
     
-    todo_component = GoogleTodoComponent(session = db)
-    evaluation_component = GPT4OEvaluationComponent(session = db)
-    sync_todo_service = SyncTodoService(todo_component=todo_component, evaluation_component=evaluation_component)
+    sync_todo_service = SyncTodoService(session = db)
     result = await sync_todo_service.execute()
     
     #end_time = time.time()
@@ -39,7 +35,7 @@ async def sync_google(db: AsyncSession = Depends(get_db_session)):
         return {"message": "finished"}
 
 @app.get("/suggest")
-async def suggest(free_time_id:str = None, db: AsyncSession = Depends(get_db_session)):
+async def suggest(free_time_id:str = None, db: AsyncSession = Depends(get_db_session), user_id:str = Depends(get_current_user_id)):
     calendar_component = GoogleCalendarComponent()
     todo_provider = LocalTodoProvider(session = db)  
     suggest_todo_service = SuggestTodoService(calendar_component=calendar_component, todo_provider=todo_provider)
@@ -78,19 +74,19 @@ async def suggest(free_time_id:str = None, db: AsyncSession = Depends(get_db_ses
     return response
     
 @app.patch("/selected-todo/add")
-async def add_selected_todo(request_body:request_params.SelectedTodoAddParams, db: AsyncSession = Depends(get_db_session)):
+async def add_selected_todo(request_body:request_params.SelectedTodoAddParams, db: AsyncSession = Depends(get_db_session), user_id:str = Depends(get_current_user_id)):
     message = await SelectedTodosService(session = db).add_selected_todo_by_id(request_body.todo_id,request_body.free_time_id)
     if message == "success":
         return {"todo_id": request_body.todo_id, "message": "success"}
 
 @app.patch("/selected-todo/remove")
-async def remove_selected_todo(request_body:request_params.SelectedTodoRemoveParams, db: AsyncSession = Depends(get_db_session)):
+async def remove_selected_todo(request_body:request_params.SelectedTodoRemoveParams, db: AsyncSession = Depends(get_db_session), user_id:str = Depends(get_current_user_id)):
     message = await SelectedTodosService(session = db).delete_selected_todo_by_id(request_body.todo_id,request_body.free_time_id)
     if message == "success":
         return {"todo_id": request_body.todo_id, "message": "success"}
 
 @app.get("/schedule")
-async def get_schedule(db: AsyncSession = Depends(get_db_session)):
+async def get_schedule(db: AsyncSession = Depends(get_db_session), user_id:str = Depends(get_current_user_id)):
     schedule = await ScheduleService(session = db).get()
     sorted_elements = schedule.get_elements_sorted_by_time()
     response_schedule = []

@@ -1,10 +1,7 @@
 from openai import OpenAI
-from src.service.shared.component.evaluation.gpt4 import tools
+from src.service.shared.provider.evaluation.gpt4o import tools
 from dotenv import load_dotenv
 import os
-import datetime
-
-from src.repository.todo_list_repo import TodoListRepo
 
 from pydantic import BaseModel
 from typing import Any
@@ -14,7 +11,7 @@ from src.domain.vos.evaluation_parms import EvaluationParmsVO
 
 load_dotenv()
 
-class GPT4EvaluationComponent(BaseModel):
+class GPT4OEvaluationProvider(BaseModel):
   session:Any
   
   #TODO# Noneの時に再リクエス処理(回数制限やモデル変えるなど)
@@ -28,7 +25,7 @@ class GPT4EvaluationComponent(BaseModel):
       content += f"\n\
         Notes:{todo.notes}"
 
-    model = "gpt-4-turbo-preview"
+    model = "gpt-4o-2024-05-13"
 
     client = OpenAI(api_key=os.getenv("API_KEY"))
 
@@ -54,25 +51,3 @@ class GPT4EvaluationComponent(BaseModel):
   async def evaluation_todo_in_list(self, todo_list:TodoList):
     for todo in todo_list.get_todos():
       await self.evaluation_todo(todo, todo_list)
-    
-  #TODO# なぜかuser_todo_list.last_evaluationがDBにデータがあってもNoneになっている。そのため毎回新規作成が走る。修正必要
-  async def do_evaluation(self):
-    repo = TodoListRepo(session = self.session)
-    user_todo_lists = await repo.fetch_user_lists_with_todos()
-    for user_todo_list in user_todo_lists:
-      if not user_todo_list.last_evaluation: 
-        # 新規作成のリストだとNullになっているので評価
-        print("新規作成")
-        await self.evaluation_todo_in_list(user_todo_list)
-        user_todo_list.last_evaluation = datetime.datetime.now(tz=datetime.timezone.utc)
-        await repo.update_list(user_todo_list)
-      elif user_todo_list.updated > user_todo_list.last_evaluation:
-        # 内容に変更があるため再評価
-        print("変更有",user_todo_list)
-        await self.evaluation_todo_in_list(user_todo_list)
-        user_todo_list.last_evaluation = datetime.datetime.now(tz=datetime.timezone.utc)
-        await repo.update_list(user_todo_list)
-      else:
-        # 変更がないため評価しない
-        print("変更なし",user_todo_list)
-          

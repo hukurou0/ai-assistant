@@ -3,29 +3,14 @@ from googleapiclient.errors import HttpError
 import datetime
 
 from src.repository.shared.google_base import GoogleBase
-from src.repository.todo_list_repo import TodoListRepo
 
 from pydantic import BaseModel
 from src.domain.entities.todo_list import TodoList
 from src.domain.entities.todo import Todo
 from typing import Any, Optional
 
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-database_url = 'postgresql://myuser:mypassword@postgres/mydatabase'
-
-# エンジンの作成
-engine = create_engine(database_url)
-
-# セッションの作成
-""" Session = sessionmaker(bind=engine)
-session = Session() """
-
-class GoogleTodoComponent(GoogleBase, BaseModel):
+class GoogleTodoRepository(GoogleBase, BaseModel):
   session:Any
-  todo_lists:Optional[list[TodoList]] = None
   
   async def _fetch_todo_lists(self)->list[TodoList]:
     creds = self.get_cred()
@@ -85,12 +70,4 @@ class GoogleTodoComponent(GoogleBase, BaseModel):
     for todo_list in todo_lists:
       todo_list_have_todos = await self._fetch_todos_from_todo_list(todo_list)
       all_todo_lists.append(todo_list_have_todos)
-    self.todo_lists = all_todo_lists
-    
-  async def do_import_to_local(self):
-    repo = TodoListRepo(session=self.session)
-    for todo_list in self.todo_lists:
-      if await repo.fetch_list_by_id(todo_list.id):
-        await repo.update_list(todo_list)
-      else:
-        await repo.create_list_with_todos(todo_list)
+    return all_todo_lists
