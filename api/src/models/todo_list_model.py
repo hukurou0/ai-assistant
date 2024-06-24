@@ -4,19 +4,22 @@ from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
 from src.domain.entities.todo import Todo
 from src.domain.entities.todo_list import TodoList
+from src.domain.entities.user import User
 
 # テーブルの定義
 class TodoListModel(Base):
     __tablename__ = 'todo_list'
 
     id = Column(String, primary_key=True)
+    user_id = Column(String, ForeignKey('app_user.id'))
     title = Column(String, nullable=False)
     updated = Column(DateTime(timezone=True))
     last_evaluation = Column(DateTime(timezone=True))
     todos = relationship("TodoModel", back_populates="todo_list", lazy='select')
     
-    def __init__(self, todo_list_entity:TodoList):
+    def __init__(self, todo_list_entity:TodoList, user:User):
         self.id       = todo_list_entity.id
+        self.user_id  = user.id
         self.title    = todo_list_entity.title
         self.updated  = todo_list_entity.updated
         self.last_evaluation  = todo_list_entity.last_evaluation

@@ -8,11 +8,12 @@ from src.models.todo_list_model import TodoListModel
 from src.models.todo_list_model import TodoModel
 from src.domain.entities.todo_list import TodoList
 from src.domain.entities.todo import Todo
+from src.domain.entities.user import User
 
 class TodoListMapper:
   @staticmethod
-  def to_model(todo_list_entity:TodoList) -> TodoListModel:
-    return TodoListModel(todo_list_entity = todo_list_entity)
+  def to_model(todo_list_entity:TodoList, user:User) -> TodoListModel:
+    return TodoListModel(todo_list_entity = todo_list_entity, user = user)
   
   def to_entity_without_todos(todo_list_model:TodoListModel) -> TodoList:
     return TodoList(
@@ -65,8 +66,8 @@ class TodoListRepo(BaseModel):
     else:
       return None 
     
-  async def fetch_user_lists_with_todos(self) -> list[TodoList]:
-    stmt = select(TodoListModel).options(selectinload(TodoListModel.todos))
+  async def fetch_user_lists_with_todos(self, user:User) -> list[TodoList]:
+    stmt = select(TodoListModel).where(TodoListModel.user_id == user.id).options(selectinload(TodoListModel.todos))
     results = await self.session.execute(stmt)
     todo_list_models = results.scalars().all()  
     todo_list_entities = []
@@ -91,8 +92,9 @@ class TodoListRepo(BaseModel):
   async def create_list(self):
     pass
   
-  async def create_list_with_todos(self, todo_list_entity:TodoList):
-    todo_list_model = TodoListMapper.to_model(todo_list_entity)
+  async def create_list_with_todos(self, todo_list_entity:TodoList, user:User):
+    todo_list_model = TodoListMapper.to_model(todo_list_entity, user)
+    print(f"todo_list_model:{todo_list_model}")
     self.session.add(todo_list_model)
     todo_entities = todo_list_entity.get_todos()
     for todo_entity in todo_entities:

@@ -7,14 +7,13 @@ from src.repository.shared.google_base import GoogleBase
 from pydantic import BaseModel
 from src.domain.entities.todo_list import TodoList
 from src.domain.entities.todo import Todo
-from typing import Any, Optional
+from src.domain.entities.user import User
+from typing import Any
 
 class GoogleTodoRepository(GoogleBase, BaseModel):
   session:Any
   
-  async def _fetch_todo_lists(self)->list[TodoList]:
-    creds = self.get_cred()
-
+  async def _fetch_todo_lists(self, creds)->list[TodoList]:
     try:
       service = build("tasks", "v1", credentials=creds)
 
@@ -34,9 +33,7 @@ class GoogleTodoRepository(GoogleBase, BaseModel):
       print(err)
       return err
   
-  async def _fetch_todos_from_todo_list(self, todo_list:TodoList)->TodoList:
-    creds = self.get_cred()
-
+  async def _fetch_todos_from_todo_list(self, todo_list:TodoList, creds)->TodoList:
     try:
       service = build("tasks", "v1", credentials=creds)
 
@@ -64,10 +61,11 @@ class GoogleTodoRepository(GoogleBase, BaseModel):
       
     return todo_list
       
-  async def fetch_todo_lists(self):
-    todo_lists = await self._fetch_todo_lists()
+  async def fetch_todo_lists(self, user:User)->list[TodoList]:
+    creds = self.get_cred(user)
+    todo_lists = await self._fetch_todo_lists(creds)
     all_todo_lists:list[TodoList] = []
     for todo_list in todo_lists:
-      todo_list_have_todos = await self._fetch_todos_from_todo_list(todo_list)
+      todo_list_have_todos = await self._fetch_todos_from_todo_list(todo_list, creds)
       all_todo_lists.append(todo_list_have_todos)
     return all_todo_lists

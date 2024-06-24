@@ -20,12 +20,12 @@ async def read_root():
 #TODO# Google-todoで削除したときにsyncできるように（現状DBに残り続ける）
 #TODO# Google-todoでtodoのみアップデートされた時syncできるように（listのupdatedが変わらないためスキップされる）
 @app.get("/sync/google-todo")
-async def sync_google(db: AsyncSession = Depends(get_db_session)):
+async def sync_google(db: AsyncSession = Depends(get_db_session), user_id:str = Depends(get_current_user_id)):
     #import time
     #start_time = time.time()
     
     sync_todo_service = SyncTodoService(session = db)
-    result = await sync_todo_service.execute()
+    result = await sync_todo_service.execute(user_id)
     
     #end_time = time.time()
     #elapsed_time = end_time - start_time
