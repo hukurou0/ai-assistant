@@ -66,7 +66,7 @@ class ScheduleService(BaseModel):
         free_time_repo = FreeTimeRepo(session=self.session)
         events = await calendar_repo.get(user)
         free_times = await self._find_free_time(events)
-        await free_time_repo.save(free_times)
+        await free_time_repo.save(free_times, user_id=user.id)
 
     async def get(self, user_id: str):  # TODO# need_syncの制御
         user_repo = UserRepo(session=self.session)
