@@ -1,3 +1,12 @@
+import Timetable from '@/components/Timetable'
+import Today from '@/components/Today'
+import React from 'react'
+
 export default function Home() {
-  return <h1 className='text-gray-900'>Main</h1>
+  return (
+    <>
+      <Today />
+      <Timetable />
+    </>
+  )
 }
