@@ -46,7 +46,7 @@ async def suggest(
     user_id: str = Depends(get_current_user_id),
 ):
     todo_provider = LocalTodoProvider(session=db)
-    suggest_todo_service = SuggestTodoService(todo_provider=todo_provider)
+    suggest_todo_service = SuggestTodoService(session=db, todo_provider=todo_provider)
     suggest_todos = await suggest_todo_service.find_well_todos(user_id)
 
     selected_todos = await SelectedTodosService(
@@ -65,15 +65,16 @@ async def suggest(
         )
 
     response_selected_todos = []
-    for selected_todo in selected_todos:
-        response_selected_todos.append(
-            {
-                "id": selected_todo.id,
-                "title": selected_todo.title,
-                "required_time": selected_todo.required_time,
-                "notes": selected_todo.notes,
-            }
-        )
+    if selected_todos:
+        for selected_todo in selected_todos:
+            response_selected_todos.append(
+                {
+                    "id": selected_todo.id,
+                    "title": selected_todo.title,
+                    "required_time": selected_todo.required_time,
+                    "notes": selected_todo.notes,
+                }
+            )
 
     response = {
         "free_time_id": free_time_id,
@@ -115,7 +116,7 @@ async def get_schedule(
     db: AsyncSession = Depends(get_db_session),
     user_id: str = Depends(get_current_user_id),
 ):
-    schedule = await ScheduleService(session=db).get()
+    schedule = await ScheduleService(session=db).get(user_id)
     sorted_elements = schedule.get_elements_sorted_by_time()
     response_schedule = []
     for sorted_element in sorted_elements:
