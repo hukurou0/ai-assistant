@@ -1,0 +1,19 @@
+{
+  "free_time_id": "string",
+  "suggest_todos": [
+    {
+      "id": "string",
+      "title": "suggest_todo_1",
+      "required_time": 0,
+      "notes": "string"
+    }
+  ],
+  "selected_todos": [
+    {
+      "id": "string",
+      "title": "suggest_todo_2",
+      "required_time": 0,
+      "notes": "string"
+    }
+  ]
+}
