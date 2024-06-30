@@ -14,7 +14,11 @@ type Event = {
   end: string
 }
 
-export default function Timetable() {
+type Props = { //仮の型
+  datas: Event[]
+}
+
+export default function Timetable(props: Props) {
   const [schedule, setSchedule] = useState<Event[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -26,8 +30,8 @@ export default function Timetable() {
   }, [])
 
   const { suggest_todos } = suggest
-  console.log(suggest)
-  console.log(data)
+  //console.log(suggest)
+  //console.log(data)
 
   const hours = Array.from({ length: 16 }, (v, i) => ({
     start: `${(i + 7).toString().padStart(2, '0')}:00`,
