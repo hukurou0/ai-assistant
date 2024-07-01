@@ -13,7 +13,7 @@ export default async function Home() {
     <>{session ? (
       <>
       <Today />
-      <Timetable datas={session ? await getSchedule(session) : []}/>
+      <Timetable datas={session ? await getSchedule() : []}/>
       </>
       ) : null}
     </>

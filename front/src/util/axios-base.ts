@@ -1,4 +1,6 @@
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import axios, { AxiosInstance } from 'axios';
+import { getServerSession } from 'next-auth';
 
 declare module 'next-auth' {
   interface Session {
@@ -7,15 +9,25 @@ declare module 'next-auth' {
 }
 
 export const AxiosUtil = {
-    async createBase(accessToken:string): Promise<AxiosInstance> {
+    async createBase(): Promise<AxiosInstance> {
+        const session = await getServerSession(authOptions)
+        let headers = {}
+        if (session) {
+          headers = {
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${session.accessToken}`
+          }
+        } else {
+          headers =  {
+            'Content-Type': 'application/json', 
+          }
+        }
+        
         const axiosBase = axios.create({
-            baseURL: 'http://localhost:8000/',
-            headers: { 
-                'Content-Type': 'application/json', 
-                'Authorization': `Bearer ${accessToken}`
-            },
-            responseType: 'json'
-        });
+          baseURL: 'http://localhost:8000/',
+          headers: headers,
+          responseType: 'json'
+        })
         return axiosBase;
     }
 }
