@@ -1,5 +1,11 @@
 import axios, { AxiosInstance } from 'axios';
 
+declare module 'next-auth' {
+  interface Session {
+    accessToken?: string;
+  }
+}
+
 export const AxiosUtil = {
     async createBase(accessToken:string): Promise<AxiosInstance> {
         const axiosBase = axios.create({

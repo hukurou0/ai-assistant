@@ -1,26 +1,21 @@
-'use client'
-
 import Timetable from '@/components/Timetable'
 import Today from '@/components/Today'
 import React from 'react'
 
 import getSchedule from '../services/schedule-service'
 
-import { useSession } from "next-auth/react"
-import { Session } from 'next-auth';
+import { getServerSession } from 'next-auth';
+import { authOptions } from './api/auth/[...nextauth]/route'
 
-declare module 'next-auth' {
-  interface Session {
-    accessToken?: string;
-  }
-}
-
-export default async function Home() { 
-  const { data } = useSession() || {}
+export default async function Home() {
+  const session = await getServerSession(authOptions);
   return (
-    <>
+    <>{session ? (
+      <>
       <Today />
-      <Timetable datas={data ? await getSchedule(data) : []}/>
+      <Timetable datas={session ? await getSchedule(session) : []}/>
+      </>
+      ) : null}
     </>
   )
 }
