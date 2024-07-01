@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { TimeSlot } from './TimetableSlot'
-import data from '../../data/mock.json'
+import mockData from '../../data/mock.json'
 import suggest from '../../data/mock_suggest.json'
 
 type Event = {
@@ -19,6 +19,7 @@ type Props = { //仮の型
 }
 
 export default function Timetable(props: Props) {
+  console.log(props.datas)
   const [schedule, setSchedule] = useState<Event[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -26,7 +27,7 @@ export default function Timetable(props: Props) {
   const [suggestions, setSuggestions] = useState([])
 
   useEffect(() => {
-    setSchedule(data)
+    setSchedule(mockData)
   }, [])
 
   const { suggest_todos } = suggest

@@ -19,24 +19,40 @@ const authOptions = {
     ),
   ],
   callbacks: {
-    async signIn({ account }: { account: any }) {
+    async jwt({ token, account }: { token: any, account: any }) {
+      // 初回サインイン時
+      if (account) {
+        token.accessToken = account.access_token
+        token.refreshToken = account.refresh_token
+      }
+      return token
+    },
+    async session({ session, token }: { session: any, token: any }) {
+      const data = {
+        access_token: token.accessToken,
+        refresh_token: token.refreshToken,
+      }
+      let response = null
+      try {
+        response = await axios.post('http://localhost:8000/signup', data,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+      } catch (error) {
+        console.error('Error sending token:', error)
+      }
+      const appToken = response?.data
+      session.accessToken = appToken["access_token"]
+      session.refreshToken = appToken["refresh_token"]
+      return session
+    },
+    async signIn({ account }: { account: any}) {
       if (account && account.provider === 'google') {
-        const data = {
-          access_token: account.access_token,
-          refresh_token: account.refresh_token,
-        }
-        try {
-          const response = await axios.post('http://localhost:8000/signup', data,
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          })
-          return response.data
-        } catch (error) {
-          console.error('Error sending token:', error)
-          return false
-        }
+        return true
+      } else {
+        return false
       }
     },
   },
