@@ -1,6 +1,6 @@
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import axios, { AxiosInstance } from 'axios';
 import { getServerSession } from 'next-auth';
+import { authOptions } from './auth';
 
 declare module 'next-auth' {
   interface Session {

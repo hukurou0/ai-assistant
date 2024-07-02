@@ -5,7 +5,8 @@ import React from 'react'
 import getSchedule from '../services/schedule-service'
 
 import { getServerSession } from 'next-auth';
-import { authOptions } from './api/auth/[...nextauth]/route'
+import { authOptions } from '@/util/auth';
+
 
 export default async function Home() {
   const session = await getServerSession(authOptions);

@@ -23,7 +23,7 @@ export default function Timetable(props: Props) {
   const [schedule, setSchedule] = useState<Event[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null as Event | null)
   const [suggestions, setSuggestions] = useState([])
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function Timetable(props: Props) {
           // onClick 핸들러 수정
           onClick={() => {
             setIsModalOpen(true)
-            setSelectedEvent(item)
+            setSelectedEvent({ ...item, id: '' })
           }}
         />
       ))}
