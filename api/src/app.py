@@ -2,7 +2,7 @@ from src.app_setting import app, get_db_session, get_current_user_id
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 
-from src.service.suggest_todo import SuggestTodoService
+from src.service.suggest_todo.suggest_todo import SuggestTodoService
 from src.service.sync_todo import SyncTodoService
 from src.service.shared.provider.local_todo import LocalTodoProvider
 from src.service.selected_todo import SelectedTodosService
@@ -41,13 +41,13 @@ async def sync_google(
 
 @app.get("/suggest")
 async def suggest(
-    free_time_id: str = None,
+    free_time_id: str = "",
     db: AsyncSession = Depends(get_db_session),
     user_id: str = Depends(get_current_user_id),
 ):
     todo_provider = LocalTodoProvider(session=db)
     suggest_todo_service = SuggestTodoService(session=db, todo_provider=todo_provider)
-    suggest_todos = await suggest_todo_service.find_well_todos(user_id)
+    suggest_todos = await suggest_todo_service.find_well_todos(user_id, free_time_id)
 
     selected_todos = await SelectedTodosService(
         session=db

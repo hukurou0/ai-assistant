@@ -9,3 +9,4 @@ repos:
     hooks:
     -   id: mypy
         files: \.py$
+        args: [--config-file=./api/mypy.ini]

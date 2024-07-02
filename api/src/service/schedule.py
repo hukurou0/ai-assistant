@@ -18,6 +18,7 @@ import pytz
 class ScheduleService(BaseModel):
     session: Any
 
+    # TODO# min_durationを設定できるように
     async def _find_free_time(
         self,
         events: list[Event],

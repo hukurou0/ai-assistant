@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from src.domain.entities.todo import Todo
-from src.domain.vos.free_time import FreeTimeVO
+from src.domain.entities.free_time import FreeTime
+
 
 class SuggestTodoVO(BaseModel):
-    free_time: FreeTimeVO
+    free_time: FreeTime
     todo: Todo
