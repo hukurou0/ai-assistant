@@ -23,30 +23,32 @@ export const authOptions: NextAuthOptions = {
       async jwt({ token, account }: { token: any, account: any }) {
         // 初回サインイン時
         if (account) {
-          token.accessToken = account.access_token
-          token.refreshToken = account.refresh_token
+          const googleAccessToken = account.access_token
+          const googleRefreshToken = account.refresh_token
+          const data = {
+            access_token: googleAccessToken,
+            refresh_token: googleRefreshToken,
+          }
+          let response = null
+          try {
+            response = await axios.post(HOST + 'signup', data,
+            {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+          } catch (error) {
+            console.error('Error sending token:', error)
+          }
+          const appToken = response?.data
+          token.accessToken = appToken["access_token"]
+          token.refreshToken = appToken["refresh_token"]
         }
         return token
       },
       async session({ session, token }: { session: any, token: any }) {
-        const data = {
-          access_token: token.accessToken,
-          refresh_token: token.refreshToken,
-        }
-        let response = null
-        try {
-          response = await axios.post(HOST + 'signup', data,
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          })
-        } catch (error) {
-          console.error('Error sending token:', error)
-        }
-        const appToken = response?.data
-        session.accessToken = appToken["access_token"]
-        session.refreshToken = appToken["refresh_token"]
+        session.accessToken = token.accessToken
+        session.refreshToken = token.refreshToken
         return session
       },
       async signIn({ account }: { account: any}) {
