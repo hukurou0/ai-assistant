@@ -12,20 +12,17 @@ DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
 
 # SQLAlchemy用のエンジンを作成
 engine = create_async_engine(
-  DATABASE_URL, 
-  #echo=True,
-  pool_size=5,          # プール内のコネクション数
-  max_overflow=10,      # プールサイズを超えた際の最大数
-  pool_timeout=30,      # プールからコネクションを取得する際のタイムアウト秒数
-  pool_recycle=-1       # コネクションを再利用するための時間（秒）、デフォルトではリサイクルしない
+    DATABASE_URL,
+    # echo=True,
+    pool_size=5,  # プール内のコネクション数
+    max_overflow=10,  # プールサイズを超えた際の最大数
+    pool_timeout=30,  # プールからコネクションを取得する際のタイムアウト秒数
+    pool_recycle=-1,  # コネクションを再利用するための時間（秒）、デフォルトではリサイクルしない
 )
 
 # セッションを作成するためのファクトリーを生成
 async_session = sessionmaker(
-    engine, 
-    expire_on_commit=False, 
-    class_=AsyncSession,
-    autocommit=False
+    engine, expire_on_commit=False, class_=AsyncSession, autocommit=False
 )
 
 # FastAPI アプリケーション
@@ -33,8 +30,7 @@ app = FastAPI()
 security = HTTPBearer()
 
 origins = [
-    "http://localhost:3000",  # React/Next.jsアプリのオリジン
-    # 他の許可するオリジンを追加できます
+    "http://front:3000",
 ]
 
 # CORSミドルウェアを追加
@@ -50,20 +46,26 @@ app.add_middleware(
 with open("./doc/v1.0.0.yaml", "r") as file:
     openapi_schema = yaml.safe_load(file)
 
+
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
+
 app.openapi = custom_openapi
+
 
 # 依存関係
 async def get_db_session() -> AsyncSession:
     async with async_session() as session:
         yield session
-        
-async def get_current_user_id(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+
+
+async def get_current_user_id(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> str:
     token = credentials.credentials
     payload = await JWTProvider.decode_jwt(token)
-    return payload["user_id"]        
+    return payload["user_id"]

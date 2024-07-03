@@ -1,0 +1,21 @@
+# ベースイメージとしてNode.jsの公式イメージを使用します
+FROM node:18-alpine
+
+# 作業ディレクトリを設定します
+WORKDIR /app
+
+# パッケージファイルをコピーします
+COPY package.json package-lock.json ./
+
+# 依存関係をインストールします
+RUN npm install
+
+# アプリケーションのソースコードをコピーします
+COPY . .
+
+# アプリケーションをビルドします
+RUN npm run build
+
+# ポート3000でアプリケーションを起動します
+EXPOSE 3000
+CMD ["npm", "run", "dev"]

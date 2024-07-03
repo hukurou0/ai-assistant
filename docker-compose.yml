@@ -13,6 +13,8 @@ services:
       - ./db/postgresql.conf:/etc/postgresql/postgresql.conf
     ports:
       - '5432:5432'
+    networks:
+      - app-network
 
   api:
     build: ./api
@@ -24,6 +26,23 @@ services:
       - postgres
     environment:
       DATABASE_URL: postgres://myuser:mypassword@postgres/mydatabase
+    networks:
+      - app-network
+
+  front:
+    build: ./front
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/app
+      - nextjs_cache:/app/.next # Next.js cache because permission denied
+    networks:
+      - app-network
 
 volumes:
   pgdata:
+  nextjs_cache:
+
+networks:
+  app-network:
+    driver: bridge

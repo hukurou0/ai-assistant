@@ -1,6 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import axios from 'axios'
+import { HOST } from './axios-base'
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -34,7 +35,7 @@ export const authOptions: NextAuthOptions = {
         }
         let response = null
         try {
-          response = await axios.post('http://localhost:8000/signup', data,
+          response = await axios.post(HOST + 'signup', data,
           {
             headers: {
               'Content-Type': 'application/json'

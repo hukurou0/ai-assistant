@@ -1,5 +1,4 @@
 import { AxiosUtil } from "@/util/axios-base";
-import { Session } from 'next-auth';
 
 const getSchedule = async () => {
     const axios = await AxiosUtil.createBase();

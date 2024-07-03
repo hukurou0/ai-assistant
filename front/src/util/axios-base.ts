@@ -8,6 +8,8 @@ declare module 'next-auth' {
   }
 }
 
+export const HOST = 'http://api:8000/';
+
 export const AxiosUtil = {
     async createBase(): Promise<AxiosInstance> {
         const session = await getServerSession(authOptions)
@@ -24,7 +26,7 @@ export const AxiosUtil = {
         }
         
         const axiosBase = axios.create({
-          baseURL: 'http://localhost:8000/',
+          baseURL: HOST,
           headers: headers,
           responseType: 'json'
         })
