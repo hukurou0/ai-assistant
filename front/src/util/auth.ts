@@ -1,7 +1,8 @@
-import { NextAuthOptions } from 'next-auth'
+import { Account, NextAuthOptions, Session } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import axios from 'axios'
 import { HOST } from './axios-base'
+import { JWT } from 'next-auth/jwt'
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -20,7 +21,7 @@ export const authOptions: NextAuthOptions = {
       ),
     ],
     callbacks: {
-      async jwt({ token, account }: { token: any, account: any }) {
+      async jwt({ token, account }: { token:JWT, account: Account | null }) {
         // 初回サインイン時
         if (account) {
           const googleAccessToken = account.access_token
@@ -46,12 +47,12 @@ export const authOptions: NextAuthOptions = {
         }
         return token
       },
-      async session({ session, token }: { session: any, token: any }) {
+      async session({ session, token }: { session: Session, token: JWT }) {
         session.accessToken = token.accessToken
         session.refreshToken = token.refreshToken
         return session
       },
-      async signIn({ account }: { account: any}) {
+      async signIn({ account }: { account: Account | null}) {
         if (account && account.provider === 'google') {
           return true
         } else {
