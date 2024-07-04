@@ -8,6 +8,8 @@ from src.domain.vos.suggest_todo_vo import SuggestTodoVO
 from src.repository.free_time_repo import FreeTimeRepo
 from src.repository.user_repo import UserRepo
 
+from src.service.suggest_todo.algorithm.dynamic_programming import DPAlgorithm
+
 
 class SuggestTodoService(BaseModel):
     session: Any
@@ -22,8 +24,6 @@ class SuggestTodoService(BaseModel):
 
         free_time_repo = FreeTimeRepo(session=self.session)
         free_time = await free_time_repo.fetch_by_id(free_time_id)
-
-        from src.service.suggest_todo.algorithm.dynamic_programming import DPAlgorithm
 
         well_todos = DPAlgorithm(free_time=free_time, todos=todos).execute()
 

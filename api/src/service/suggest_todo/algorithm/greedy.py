@@ -1,48 +1,34 @@
 from src.domain.entities.free_time import FreeTime
 from src.domain.entities.todo import Todo
 from src.domain.vos.suggest_todo_vo import SuggestTodoVO
+from src.domain.vos.converted_todo_vo import ConvertedTodoVO
 
-from pydantic import BaseModel
-
-
-class ConvertedTodo(BaseModel):
-    id: str
-    value: float
-    time: int
-
-    def __str__(self):
-        return f"id: {self.id}, value: {self.value}, time: {self.time}"
+from src.service.suggest_todo.algorithm.util.handle_todo import (
+    convert_todos,
+    revert_todo,
+)
 
 
 class GreedyAlgorithm:
     def __init__(self, free_time: FreeTime, todos: list[Todo]):
         self.free_time = free_time
         self.todos = todos
-        self.__converted_todos: list[ConvertedTodo] = []
+        self.__converted_todos: list[ConvertedTodoVO] = []
+        self.well_todos: list[SuggestTodoVO] = []
 
-    def __convert_todos(self):
-        for todo in self.todos:
-            if todo.required_time and todo.priority:
-                value = todo.priority / todo.required_time
-                self.__converted_todos.append(
-                    ConvertedTodo(id=todo.id, value=value, time=todo.required_time)
-                )
-        self.__converted_todos.sort(key=lambda todo: todo.value, reverse=True)
+    def _culc_value(self, todo: Todo) -> float:
+        return todo.priority / todo.required_time
 
-    def __revert(self, converted_todo: ConvertedTodo) -> Todo:
-        for todo in self.todos:
-            if todo.id == converted_todo.id:
-                return todo
+    def execute(self) -> list[SuggestTodoVO]:
+        self.__converted_todos = convert_todos(self.todos, self._culc_value)
 
-    def execute(self):
-        self.__convert_todos()
-
-        well_todos: list[SuggestTodoVO] = []
         duration = self.free_time.get_duration()
-        for i, converted_todo in enumerate(self.__converted_todos):
-            todo = self.__revert(converted_todo)
+        for converted_todo in self.__converted_todos:
+            todo = revert_todo(converted_todo, self.todos)
             if duration >= todo.required_time:
-                well_todos.append(SuggestTodoVO(free_time=self.free_time, todo=todo))
+                self.well_todos.append(
+                    SuggestTodoVO(free_time=self.free_time, todo=todo)
+                )
                 duration -= todo.required_time
 
-        return well_todos
+        return self.well_todos

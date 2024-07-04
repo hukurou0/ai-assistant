@@ -1,34 +1,27 @@
 from src.domain.entities.free_time import FreeTime
 from src.domain.entities.todo import Todo
 from src.domain.vos.suggest_todo_vo import SuggestTodoVO
+from src.domain.vos.converted_todo_vo import ConvertedTodoVO
 
-from pydantic import BaseModel
-
-
-class ConvertedTodo(BaseModel):
-    id: str
-    value: int
-    time: int
+from src.service.suggest_todo.algorithm.util.handle_todo import (
+    convert_todos,
+    revert_todo,
+)
 
 
 class DPAlgorithm:
     def __init__(self, free_time: FreeTime, todos: list[Todo]):
         self.free_time = free_time
         self.todos = todos
-        self.__converted_todos: list[ConvertedTodo] = []
+        self.__converted_todos: list[ConvertedTodoVO] = []
+        self.well_todos: list[SuggestTodoVO] = []
 
-    def __convert_todos(self):
-        for todo in self.todos:
-            if todo.required_time and todo.priority:
-                self.__converted_todos.append(
-                    ConvertedTodo(
-                        id=todo.id, value=todo.priority, time=todo.required_time
-                    )
-                )
+    def _culc_value(self, todo: Todo) -> float:
+        return todo.priority
 
     def __knapsack(
-        self, todos: list[ConvertedTodo], max_time: int
-    ) -> list[ConvertedTodo]:
+        self, todos: list[ConvertedTodoVO], max_time: int
+    ) -> list[ConvertedTodoVO]:
         n = len(todos)
         dp = [[0] * (max_time + 1) for _ in range(n + 1)]
 
@@ -52,20 +45,14 @@ class DPAlgorithm:
         selected_todos.reverse()
         return selected_todos
 
-    def __revert(self, converted_todo: ConvertedTodo) -> Todo:
-        for todo in self.todos:
-            if todo.id == converted_todo.id:
-                return todo
+    def execute(self) -> list[SuggestTodoVO]:
+        self.__converted_todos = convert_todos(self.todos, self._culc_value)
 
-    def execute(self):
-        self.__convert_todos()
-
-        well_todos: list[SuggestTodoVO] = []
         duration = self.free_time.get_duration()
         suggest_todos = self.__knapsack(self.__converted_todos, duration)
         for todo in suggest_todos:
             well_todo = SuggestTodoVO(
-                free_time=self.free_time, todo=self.__revert(todo)
+                free_time=self.free_time, todo=revert_todo(todo, self.todos)
             )
-            well_todos.append(well_todo)
-        return well_todos
+            self.well_todos.append(well_todo)
+        return self.well_todos
