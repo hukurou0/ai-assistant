@@ -52,6 +52,6 @@ class Todo(BaseModel):
 
     def __str__(self):
         if self.required_time:
-            return f"title:{self.title}, required_time:{self.required_time}"
+            return f"title:{self.title}, required_time:{self.required_time}, priority_level:{self.priority_level}, importance_level:{self.importance_level}"
         else:
             return f"title:{self.title}, required_time:{None}"

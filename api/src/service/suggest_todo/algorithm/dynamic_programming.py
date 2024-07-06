@@ -3,6 +3,8 @@ from src.domain.entities.todo import Todo
 from src.domain.vos.suggest_todo_vo import SuggestTodoVO
 from src.domain.vos.converted_todo_vo import ConvertedTodoVO
 
+import math
+
 from src.service.suggest_todo.algorithm.util.handle_todo import (
     convert_todos,
     revert_todo,
@@ -17,7 +19,12 @@ class DPAlgorithm:
         self.well_todos: list[SuggestTodoVO] = []
 
     def _culc_value(self, todo: Todo) -> float:
-        return todo.priority_level
+        importance_weight = 1.5
+        priority_weight = 1.0
+        importance_level = todo.importance_level * importance_weight
+        priority_level = todo.priority_level * priority_weight
+        required_time = math.log(todo.required_time + 1)
+        return (importance_level - priority_level) / required_time
 
     def __knapsack(
         self, todos: list[ConvertedTodoVO], max_time: int
