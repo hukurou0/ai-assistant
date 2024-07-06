@@ -15,15 +15,16 @@ class SuggestTodoService(BaseModel):
     session: Any
     todo_provider: Union[LocalTodoProvider]
 
-    async def find_well_todos(
-        self, user_id: str, free_time_id: str
-    ) -> list[SuggestTodoVO]:
-        user_repo = UserRepo(session=self.session)
-        user = await user_repo.fetch_user_by_id(user_id)
-        todos = await self.todo_provider.fetch_todos(user)
+    async def find_well_todos(self) -> list[SuggestTodoVO]:
+        from src.repository.mock.todo.todos_to_object import load_todos_from_json
+        from src.repository.mock.free_time.free_time_to_object import (
+            load_free_time_from_json,
+        )
 
-        free_time_repo = FreeTimeRepo(session=self.session)
-        free_time = await free_time_repo.fetch_by_id(free_time_id)
+        todos = load_todos_from_json("src/repository/mock/todo/todos.json")
+        free_time = load_free_time_from_json(
+            "src/repository/mock/free_time/free_time.json"
+        )
 
         well_todos = DPAlgorithm(free_time=free_time, todos=todos).execute()
 

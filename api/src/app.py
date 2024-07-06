@@ -41,17 +41,11 @@ async def sync_google(
 
 @app.get("/suggest")
 async def suggest(
-    free_time_id: str = "",
     db: AsyncSession = Depends(get_db_session),
-    user_id: str = Depends(get_current_user_id),
 ):
     todo_provider = LocalTodoProvider(session=db)
     suggest_todo_service = SuggestTodoService(session=db, todo_provider=todo_provider)
-    suggest_todos = await suggest_todo_service.find_well_todos(user_id, free_time_id)
-
-    selected_todos = await SelectedTodosService(
-        session=db
-    ).get_selected_todos_by_free_time_id(free_time_id)
+    suggest_todos = await suggest_todo_service.find_well_todos()
 
     response_suggest_todos = []
     for suggest_todo in suggest_todos:
@@ -64,22 +58,9 @@ async def suggest(
             }
         )
 
-    response_selected_todos = []
-    if selected_todos:
-        for selected_todo in selected_todos:
-            response_selected_todos.append(
-                {
-                    "id": selected_todo.id,
-                    "title": selected_todo.title,
-                    "required_time": selected_todo.required_time,
-                    "notes": selected_todo.notes,
-                }
-            )
-
     response = {
-        "free_time_id": free_time_id,
+        "free_time_id": "sample_free_time_id",
         "suggest_todos": response_suggest_todos,
-        "selected_todos": response_selected_todos,
     }
 
     return response
