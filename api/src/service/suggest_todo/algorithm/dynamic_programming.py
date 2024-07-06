@@ -17,7 +17,7 @@ class DPAlgorithm:
         self.well_todos: list[SuggestTodoVO] = []
 
     def _culc_value(self, todo: Todo) -> float:
-        return todo.priority
+        return todo.priority_level
 
     def __knapsack(
         self, todos: list[ConvertedTodoVO], max_time: int

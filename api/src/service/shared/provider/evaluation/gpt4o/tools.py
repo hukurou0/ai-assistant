@@ -1,28 +1,29 @@
+from src.domain.entities.todo import Todo
+
 tools = [
     {
-        "type":"function",
-        "function":{
+        "type": "function",
+        "function": {
             "name": "display_info",
-            "description": "Show users how difficult a task is and how long it will taken",
+            "description": "Displays detailed information about a specific task including its required time, priority level, and importance level.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "difficulty": {
-                        "type": "integer",
-                        "description": "Score the difficulty of the task on a scale of 1-10",
-                    },
                     "required_time": {
-                        "type": "integer", 
-                        "description": "Number of minutes it takes to perform the task."
-                    },
-                    "priority": {
                         "type": "integer",
-                        "description": "Score the priority of the task on a scale of 1-10",
+                        "description": Todo.Explanation.required_time,
+                    },
+                    "priority_level": {
+                        "type": "integer",
+                        "description": Todo.Explanation.priority_level,
+                    },
+                    "importance_level": {
+                        "type": "integer",
+                        "description": Todo.Explanation.importance_level,
                     },
                 },
-                "required": ["difficulty", "required_time","priority"],
+                "required": ["required_time", "priority_level", "importance_level"],
             },
-        }
-        
+        },
     }
 ]

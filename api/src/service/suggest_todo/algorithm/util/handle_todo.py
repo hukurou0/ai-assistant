@@ -5,7 +5,7 @@ from src.domain.vos.converted_todo_vo import ConvertedTodoVO
 def convert_todos(todos: list[Todo], culc_value) -> list[ConvertedTodoVO]:
     converted_todos: list[ConvertedTodoVO] = []
     for todo in todos:
-        if todo.required_time and todo.priority:
+        if todo.required_time and todo.priority_level:
             value = culc_value(todo)
             converted_todos.append(
                 ConvertedTodoVO(id=todo.id, value=value, time=todo.required_time)

@@ -17,7 +17,7 @@ class GreedyAlgorithm:
         self.well_todos: list[SuggestTodoVO] = []
 
     def _culc_value(self, todo: Todo) -> float:
-        return todo.priority / todo.required_time
+        return todo.priority_level / todo.required_time
 
     def execute(self) -> list[SuggestTodoVO]:
         self.__converted_todos = convert_todos(self.todos, self._culc_value)

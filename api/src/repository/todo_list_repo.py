@@ -54,9 +54,9 @@ class TodoMapper:
             position=todo_model.position,
             status=todo_model.status,
             due=todo_model.due,
-            difficulty=todo_model.difficulty,
             required_time=todo_model.required_time,
-            priority=todo_model.priority,
+            priority_level=todo_model.priority_level,
+            importance_level=todo_model.importance_level,
         )
 
 
@@ -175,9 +175,9 @@ class TodoListRepo(BaseModel):
                         position=todo.position,
                         status=todo.status,
                         due=todo.due,
-                        difficulty=todo.difficulty,
                         required_time=todo.required_time,
-                        priority=todo.priority,
+                        priority_level=todo.priority_level,
+                        importance_level=todo.importance_level,
                     )
                 )
                 await self.session.execute(stmt)
