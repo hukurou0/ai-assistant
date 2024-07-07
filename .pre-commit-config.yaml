@@ -10,3 +10,9 @@ repos:
     -   id: mypy
         files: \.py$
         args: [--config-file=./api/mypy.ini]
+-   repo: https://github.com/pre-commit/mirrors-eslint
+    rev: 'v9.6.0'  # Use the sha / tag you want to point at
+    hooks:
+    -   id: eslint
+        files: \.[jt]sx?$
+        types: [file]
