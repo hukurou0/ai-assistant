@@ -16,7 +16,7 @@ declare module 'next-auth/jwt' {
   }
 }
 
-export const HOST = 'http://api:8000/';
+export const HOST = process.env.REACT_API_HOST;
 
 export const AxiosUtil = {
     async createBase(): Promise<AxiosInstance> {
