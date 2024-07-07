@@ -49,36 +49,27 @@ class CalendarRepo(GoogleBase, BaseModel):
             # 現在時刻が20:00を過ぎている場合は、次の日の20:00を設定
             if now > end:
                 end += timedelta(days=1)
-            events_result = (
-                service.events()
-                .list(
-                    calendarId="primary",
-                    timeMin=now.isoformat(),
-                    timeMax=end.isoformat(),
-                    singleEvents=True,
-                    orderBy="startTime",
-                )
-                .execute()
-            )
-            events = events_result.get("items", [])
 
-            class_result = (
-                service.events()
-                .list(
-                    calendarId="95409190d7447bc8f5c7be0d2f3a647c7f5c653098e46de726ee4ddff5a7d681@group.calendar.google.com",
-                    timeMin=now.isoformat(),
-                    timeMax=end.isoformat(),
-                    singleEvents=True,
-                    orderBy="startTime",
+            calendar_list = service.calendarList().list().execute()
+            events = []
+            calendar_ids = [calendar["id"] for calendar in calendar_list["items"]]
+            for calendar_id in calendar_ids:
+                events_result = (
+                    service.events()
+                    .list(
+                        calendarId=calendar_id,
+                        timeMin=now.isoformat(),
+                        timeMax=end.isoformat(),
+                        singleEvents=True,
+                        orderBy="startTime",
+                    )
+                    .execute()
                 )
-                .execute()
-            )
-            class_times = class_result.get("items", [])
+                events.extend(events_result.get("items", []))
         except HttpError as error:
-            print(f"An error occurred: {error}")
+            print(f"An error occurred when fetch events from Google Calendar: {error}")
 
-        all_events = events + class_times
         sorted_events = sorted(
-            all_events, key=lambda x: self._parse_event_datetime(event_start=x["start"])
+            events, key=lambda x: self._parse_event_datetime(event_start=x["start"])
         )
         return [self._parse_event(event) for event in sorted_events]
