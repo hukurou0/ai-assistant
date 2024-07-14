@@ -203,3 +203,7 @@ packages/react-devtools-timeline/dist
 # Google secret
 client_secret*
 token.json
+
+# deploy
+deploy-package
+deploy_package.zip

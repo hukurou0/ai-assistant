@@ -1,0 +1,10 @@
+cd api
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+mkdir deploy-package
+cp -r .venv/lib/python3.11/site-packages/* deploy-package/
+cp -r doc deploy-package/
+cp -r src deploy-package/
+cd deploy-package/
+zip -r ../deploy_package.zip .
