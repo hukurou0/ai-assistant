@@ -1,6 +1,7 @@
 from src.app_setting import app, get_db_session, get_current_user_id
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
+from mangum import Mangum
 
 from src.service.suggest_todo.suggest_todo import SuggestTodoService
 from src.service.sync_todo import SyncTodoService
@@ -165,3 +166,6 @@ async def check(
 ):
     token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTA3ODA0MDg1Njk5NjI4ODg4NTg5In0.Vu9PjOAGDmF5XjWZwg4l5UpdTcUYjzoEkHtSj1qq_PE"
     user = await UserService(session=db).get_user_by_id(user_id)
+
+
+handler = Mangum(app)
