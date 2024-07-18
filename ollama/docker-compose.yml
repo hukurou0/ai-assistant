@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  postgres:
+    build: ../db
+    restart: always
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../db/postgresql.conf:/etc/postgresql/postgresql.conf
+    ports:
+      - '5432:5432'
+    networks:
+      - app-network
+
+  api:
+    build: ../api
+    volumes:
+      - ../api:/app
+    ports:
+      - '8000:8000'
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://myuser:mypassword@postgres/mydatabase
+    networks:
+      - app-network
+
+  front:
+    build: ../front
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../front:/app
+      - nextjs_cache:/app/.next # Next.js cache because permission denied
+    networks:
+      - app-network
+    
+  ollama:
+    build: .
+    volumes:
+      # - ./ollama:/app
+      - ./:/app
+    ports:
+      - "9000:9000"
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+  nextjs_cache:
+  ollama:
+
+networks:
+  app-network:
+    driver: bridge
