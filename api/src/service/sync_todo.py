@@ -4,11 +4,8 @@ from typing import Any
 from src.repository.google_todo_repo import GoogleTodoRepository
 from src.repository.todo_list_repo import TodoListRepo
 from src.repository.user_repo import UserRepo
-from src.service.shared.provider.evaluation.gpt4o.gpt4o_evaluation import (
-    GPT4OEvaluationProvider,
-)
-from src.service.shared.provider.evaluation.local.llama3.evaluation import (
-    LocalOllama3EvaluationProvider,
+from src.service.shared.provider.evaluation.gpt4omini.gpt4omini_evaluation import (
+    GPT4OMiniEvaluationProvider,
 )
 
 import datetime
@@ -35,7 +32,7 @@ class SyncTodoService(BaseModel):
         for user_todo_list in user_todo_lists:
             # 評価実行-新規作成のリスト
             if not user_todo_list.last_evaluation:
-                await LocalOllama3EvaluationProvider(
+                await GPT4OMiniEvaluationProvider(
                     session=self.session
                 ).evaluation_todo_in_list(user_todo_list)
                 user_todo_list.last_evaluation = datetime.datetime.now(
@@ -44,7 +41,7 @@ class SyncTodoService(BaseModel):
                 await todo_list_repo.update_list(user_todo_list)
             # 評価実行-todoの内容に変更があり
             elif user_todo_list.updated > user_todo_list.last_evaluation:
-                await LocalOllama3EvaluationProvider(
+                await GPT4OMiniEvaluationProvider(
                     session=self.session
                 ).evaluation_todo_in_list(user_todo_list)
                 user_todo_list.last_evaluation = datetime.datetime.now(
