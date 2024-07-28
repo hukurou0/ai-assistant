@@ -1,26 +1,8 @@
 from langchain_experimental.llms.ollama_functions import OllamaFunctions
+from tools import tools
 
 model = OllamaFunctions(model="llama3", format="json")
 model = model.bind_tools(
-    tools=[
-        {
-            "name": "get_current_weather",
-            "description": "Get the current weather in a given location",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "location": {
-                        "type": "string",
-                        "description": "The city and state, " "e.g. San Francisco, CA",
-                    },
-                    "unit": {
-                        "type": "string",
-                        "enum": ["celsius", "fahrenheit"],
-                    },
-                },
-                "required": ["location"],
-            },
-        }
-    ],
-    function_call={"name": "get_current_weather"},
+    tools=[tools[0]["function"]],
+    function_call={"name": "display_info"},
 )
