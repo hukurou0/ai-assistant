@@ -1,8 +1,11 @@
 import React from 'react';
 
+import Box from '@/components/Box';
+
 const Settings = () => {
   return (
-    <div className="h-screen bg-gray-100 flex flex-col items-center">
+    <Box>
+    <div className="h-screen flex flex-col items-center">
       <div className="w-full max-w-md mx-auto mt-10">
         {/* Header */}
         <div className="flex items-center justify-between border-b pb-3 mb-5">
@@ -157,6 +160,7 @@ const Settings = () => {
         </div>
       </div>
     </div>
+    </Box>
   );
 };
 
