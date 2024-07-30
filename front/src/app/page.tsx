@@ -3,16 +3,16 @@ import React from 'react'
 
 //import getSchedule from '../services/schedule-service'
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/util/auth';
+//import { getServerSession } from 'next-auth';
+//import { authOptions } from '@/util/auth';
 import Box from '@/components/Box';
 
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
+  //const session = await getServerSession(authOptions);
   return (
     <>
-    {session ? (
+    {true ? (
       <>
       <h1 className='text-2xl font-semibold text-center mt-5'>今日のスケジュール</h1>
       <hr className="border-t border-gray-300 my-4" />
