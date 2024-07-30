@@ -203,3 +203,9 @@ packages/react-devtools-timeline/dist
 # Google secret
 client_secret*
 token.json
+
+# Ignore PWA service worker files
+sw.js
+sw.js.map
+workbox-*.js
+workbox-*.js.map
