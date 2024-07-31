@@ -79,9 +79,9 @@ export default function Timetable(props: Props) {
       <ol className="relative border-s border-gray-200 dark:border-gray-700"> 
         {initialSchedule.map((schedule) => {
           if (isEventData(schedule)) {
-            return <Event data={schedule} key={schedule.id}/>;
+            return <Event key={schedule.id} data={schedule}/>;
           } else if (isFreeTimeData(schedule)) {
-            return <FreeTime data={schedule} key={schedule.id}/>;
+            return <FreeTime key={schedule.id} data={schedule}/>;
           }
         })}              
       </ol>
