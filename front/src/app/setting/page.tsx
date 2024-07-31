@@ -1,8 +1,19 @@
 import React from 'react';
 
 import Box from '@/components/Box';
+import Logout from '@/components/Logout';
 
-const Settings = () => {
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/util/auth';
+import { redirect } from 'next/navigation';
+
+const Settings = async () => {
+  const session = await getServerSession(authOptions);
+
+  if (!session){
+    redirect('/');
+  }
+
   return (
     <Box>
     <div className="h-screen flex flex-col items-center">
@@ -159,6 +170,7 @@ const Settings = () => {
           </svg>
         </div>
       </div>
+      <Logout />
     </div>
     </Box>
   );

@@ -25,7 +25,7 @@ export const viewport = 'width=device-width, initial-scale=1';
 
 export const themeColor = '#000000';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en' className={openSans.className}>
       <body className='w-full max-w-screen-xl overflow-auto mx-auto'>
