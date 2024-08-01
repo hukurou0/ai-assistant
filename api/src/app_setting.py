@@ -7,8 +7,13 @@ import yaml
 
 from src.service.shared.provider.jwt import JWTProvider
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 # データベース設定
-DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@postgres/mydatabase"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # SQLAlchemy用のエンジンを作成
 engine = create_async_engine(

@@ -24,8 +24,6 @@ services:
       - '8000:8000'
     depends_on:
       - postgres
-    environment:
-      DATABASE_URL: postgres://myuser:mypassword@postgres/mydatabase
     networks:
       - app-network
 
