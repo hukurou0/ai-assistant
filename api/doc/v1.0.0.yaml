@@ -3,6 +3,19 @@ info:
   title: Todo Suggestion API
   version: 1.0.0
 paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: Helloworld
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Hello, world!"
   /suggest:
     get:
       summary: 特定の空き時間に対しての推奨todoを取得する
