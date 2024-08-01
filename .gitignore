@@ -204,6 +204,13 @@ packages/react-devtools-timeline/dist
 client_secret*
 token.json
 
+# Ignore PWA service worker files
+sw.js
+sw.js.map
+workbox-*.js
+workbox-*.js.map
+
+
 # deploy
 deploy-package
 deploy_package.zip

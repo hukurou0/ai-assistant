@@ -1,133 +1,89 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { TimeSlot } from './TimetableSlot'
-import mockData from '../../data/mock.json'
-import suggest from '../../data/mock_suggest.json'
+import Event from './Event'
+import FreeTime from './FreeTime';
 
-type Event = {
-  type: string
-  id: string
-  description?: string
-  summary?: string
-  start: string
-  end: string
+interface EventData {
+  type: string,
+  id: string,
+  now: boolean,
+  summary: string,
+  time: string,
+  description: string,
 }
 
+interface FreeTimeData {
+  type: string,
+  id: string,
+  now: boolean,
+  time: string,
+  selectedTodos: string[],
+}
+
+type ScheduleData = EventData | FreeTimeData
+type ScheduleDataList = ScheduleData[]
+
 type Props = { //仮の型
-  datas: Event[]
+  datas: ScheduleDataList
 }
 
 export default function Timetable(props: Props) {
-  console.log(props.datas)
-  const [schedule, setSchedule] = useState<Event[]>([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const initialSchedule = [
+    {
+      type: 'event',
+      id: '1',
+      now: true,
+      summary: 'FastLabel 出勤',
+      time: '07:00 - 08:00',
+      description: '3件のミーティングと開発',
+    },
+    {
+      type: 'free_time',
+      id: '2',
+      now: false,
+      time: '08:00 - 09:00',
+      selectedTodos: ['Individual configuration', 'No setup, or hidden fees'],
+    },
+    {
+      type: 'free_time',
+      id: '3',
+      now: false,
+      time: '08:00 - 09:00',
+      selectedTodos: ['Individual configuration', 'No setup, or hidden fees'],
+    },
+    {
+      type: 'free_time',
+      id: '4',
+      now: false,
+      time: '08:00 - 09:00',
+      selectedTodos: ['Individual configuration', 'No setup, or hidden fees'],
+    },
+    {
+      type: 'free_time',
+      id: '5',
+      now: false,
+      time: '08:00 - 09:00',
+      selectedTodos: ['Individual configuration', 'No setup, or hidden fees'],
+    },
+  ]
 
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null as Event | null)
-  const [suggestions, setSuggestions] = useState([])
-
-  useEffect(() => {
-    setSchedule(mockData)
-  }, [])
-
-  const { suggest_todos } = suggest
-  //console.log(suggest)
-  //console.log(data)
-
-  const hours = Array.from({ length: 16 }, (v, i) => ({
-    start: `${(i + 7).toString().padStart(2, '0')}:00`,
-    end: `${(i + 8).toString().padStart(2, '0')}:00`,
-    type: 'free_time',
-  }))
-
-  const mappedSchedule = hours.map(hour => {
-    const event = schedule.find(event => {
-      const eventStart = parseInt(event.start.split(':')[0])
-      const eventEnd = parseInt(event.end.split(':')[0])
-      const hourStart = parseInt(hour.start.split(':')[0])
-
-      return hourStart >= eventStart && hourStart < eventEnd
-    })
-
-    if (event) {
-      return {
-        ...hour,
-        type: event.type,
-        description: event.description,
-        summary: event.summary || 'Free time',
-      }
-    } else {
-      // 프리타임인 경우, suggest_todos에서 랜덤하게 선택하여 표시
-      const suggestions = suggest_todos
-        .map(todo => `${todo.title}: ${todo.notes}`)
-        .join(', ')
-
-      return {
-        ...hour,
-        summary: 'Free time',
-      }
-    }
-  })
+  function isEventData(data: ScheduleData): data is EventData {
+    return data.type === 'event';
+  }
+  
+  function isFreeTimeData(data: ScheduleData): data is FreeTimeData {
+    return data.type === 'free_time';
+  }
 
   return (
-    <div className='flex flex-col items-center justify-center'>
-      {mappedSchedule.map((item, index) => (
-        <TimeSlot
-          key={index}
-          start={item.start}
-          end={item.end}
-          type={item.type}
-          summary={item.summary}
-          // onClick 핸들러 수정
-          onClick={() => {
-            setIsModalOpen(true)
-            setSelectedEvent({ ...item, id: '' })
-          }}
-        />
-      ))}
-      {/* Add these lines */}
-      {isModalOpen && (
-        <div className='modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50'>
-          <div className='modal-content bg-white p-6 rounded-lg shadow-xl'>
-            {/* 선택된 이벤트 정보 표시 */}
-            {selectedEvent && (
-              <div>
-                <h2 className='text-xl font-semibold'>{selectedEvent.type}</h2>
-                <p className='mt-2'>{selectedEvent.summary}</p>
-                {selectedEvent.type === 'free_time' ? (
-                  <>
-                    <h3 className='text-lg font-semibold mt-4'>Suggestions:</h3>
-                    <ul className='list-disc list-inside'>
-                      {suggestions.map((suggestion, index) => (
-                        <li key={index}>{suggestion}</li>
-                      ))}
-                    </ul>
-                  </>
-                ) : (
-                  <>
-                    <p className='mt-2'>{selectedEvent.description}</p>
-                    <p className='mt-2'>
-                      <span className='font-semibold'>Start:</span>{' '}
-                      {selectedEvent.start} <br />
-                      <span className='font-semibold'>End:</span>{' '}
-                      {selectedEvent.end}
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
-            <button
-              className='close mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 transition duration-150 ease-in-out'
-              onClick={() => {
-                setIsModalOpen(false)
-                setSelectedEvent(null) // 모달 닫을 때 선택된 이벤트 상태 초기화
-              }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
+      <ol className="relative border-s border-gray-200 dark:border-gray-700"> 
+        {initialSchedule.map((schedule) => {
+          if (isEventData(schedule)) {
+            return <Event key={schedule.id} data={schedule}/>;
+          } else if (isFreeTimeData(schedule)) {
+            return <FreeTime key={schedule.id} data={schedule}/>;
+          }
+        })}              
+      </ol>
+    )
 }
