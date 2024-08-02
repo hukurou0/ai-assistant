@@ -168,4 +168,12 @@ async def check(
     user = await UserService(session=db).get_user_by_id(user_id)
 
 
+@app.get("/db-init")
+async def get_schedule():
+    import drop_table
+    import create_table
+
+    return {"resulet": "finish"}
+
+
 handler = Mangum(app)
