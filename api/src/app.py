@@ -115,8 +115,33 @@ async def remove_selected_todo(
 @app.get("/schedule")
 async def get_schedule(
     db: AsyncSession = Depends(get_db_session),
+    user_id: str = Depends(get_current_user_id),
 ):
-    return {"message": "hello_world"}
+    schedule = await ScheduleService(session=db).get(user_id)
+    sorted_elements = schedule.get_elements_sorted_by_time()
+    response_schedule = []
+    for sorted_element in sorted_elements:
+        if sorted_element.__class__.__name__ == "Event":
+            response_schedule.append(
+                {
+                    "type": "event",
+                    "id": sorted_element.id,
+                    "summary": sorted_element.summary,
+                    "description": sorted_element.description,
+                    "start": sorted_element.start,
+                    "end": sorted_element.end,
+                }
+            )
+        elif sorted_element.__class__.__name__ == "FreeTime":
+            response_schedule.append(
+                {
+                    "type": "free_time",
+                    "id": sorted_element.id,
+                    "start": sorted_element.start,
+                    "end": sorted_element.end,
+                }
+            )
+    return {"schedule": response_schedule}
 
 
 @app.post("/signup")
