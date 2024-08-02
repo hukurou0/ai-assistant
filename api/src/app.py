@@ -16,7 +16,7 @@ from src.const import request_params
 # ルートエンドポイント
 @app.get("/")
 async def read_root():
-    return {"message": "hello"}
+    return {"message": "hello world"}
 
 
 # TODO# Google-todoで削除したときにsyncできるように（現状DBに残り続ける）
