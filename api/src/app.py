@@ -113,7 +113,9 @@ async def remove_selected_todo(
 
 
 @app.get("/schedule")
-async def get_schedule():
+async def get_schedule(
+    db: AsyncSession = Depends(get_db_session),
+):
     return {"message": "hello_world"}
 
 
