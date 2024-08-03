@@ -115,6 +115,7 @@ async def get_schedule(
                     "description": sorted_element.description,
                     "start": sorted_element.start,
                     "end": sorted_element.end,
+                    "now": True,
                 }
             )
         elif sorted_element.__class__.__name__ == "FreeTime":
@@ -124,6 +125,7 @@ async def get_schedule(
                     "id": sorted_element.id,
                     "start": sorted_element.start,
                     "end": sorted_element.end,
+                    "now": False,
                 }
             )
     return {"schedule": response_schedule}
