@@ -45,8 +45,8 @@ class TodoModel(Base):
     importance_level = Column(Integer)
 
     todo_list = relationship("TodoListModel", back_populates="todos")
-    selected_todos = relationship(
-        "SelectedTodosModel", back_populates="todo", lazy="select"
+    suggest_todo = relationship(
+        "SuggestTodoModel", back_populates="todo", lazy="select"
     )
 
     def __init__(self, todo_entity: Todo, todo_list_model: TodoListModel):

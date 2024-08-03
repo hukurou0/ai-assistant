@@ -1,6 +1,6 @@
 from src.models.make_base import Base
-from sqlalchemy import create_engine, Column, String, DateTime, ForeignKey, Integer
-from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from sqlalchemy import Column, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 
 
 # テーブルの定義
@@ -12,8 +12,8 @@ class FreeTimeModel(Base):
     start = Column(DateTime(timezone=True))
     end = Column(DateTime(timezone=True))
 
-    selected_todos = relationship(
-        "SelectedTodosModel", back_populates="free_time", lazy="select"
+    suggest_todo = relationship(
+        "SuggestTodoModel", back_populates="free_time", lazy="select"
     )
 
     def __init__(self, id, user_id, start, end):

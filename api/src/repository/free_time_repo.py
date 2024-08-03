@@ -48,7 +48,7 @@ class FreeTimeRepo(BaseModel):
                 for free_time_model in free_time_models
             ]
         else:
-            return None
+            return []
 
     async def save(self, free_times: list[FreeTime], user_id: str):
         for free_time in free_times:

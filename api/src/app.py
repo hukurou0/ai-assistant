@@ -2,9 +2,8 @@ from src.app_setting import app, get_db_session, get_current_user_id
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 
-from src.service.suggest_todo.suggest_todo import SuggestTodoService
+from src.service.suggest_todo.suggest_todo_service import SuggestTodoService
 from src.service.sync_todo import SyncTodoService
-from src.service.shared.provider.local_todo import LocalTodoProvider
 from src.service.selected_todo import SelectedTodosService
 from src.service.schedule import ScheduleService
 from src.service.user import UserService
@@ -45,41 +44,28 @@ async def suggest(
     db: AsyncSession = Depends(get_db_session),
     user_id: str = Depends(get_current_user_id),
 ):
-    todo_provider = LocalTodoProvider(session=db)
-    suggest_todo_service = SuggestTodoService(session=db, todo_provider=todo_provider)
-    suggest_todos = await suggest_todo_service.find_well_todos(user_id, free_time_id)
-
-    selected_todos = await SelectedTodosService(
-        session=db
-    ).get_selected_todos_by_free_time_id(free_time_id)
+    suggest_todo_service = SuggestTodoService(session=db)
+    free_time_id, suggest_todos = await suggest_todo_service.get_suggest_todos(
+        user_id, free_time_id
+    )
 
     response_suggest_todos = []
     for suggest_todo in suggest_todos:
         response_suggest_todos.append(
             {
-                "id": suggest_todo.todo.id,
-                "title": suggest_todo.todo.title,
-                "required_time": suggest_todo.todo.required_time,
-                "notes": suggest_todo.todo.notes,
+                "suggest_todo": {
+                    "id": suggest_todo.id,
+                    "title": suggest_todo.title,
+                    "required_time": suggest_todo.required_time,
+                    "notes": suggest_todo.notes,
+                },
+                "selected": suggest_todo.selected,
             }
         )
-
-    response_selected_todos = []
-    if selected_todos:
-        for selected_todo in selected_todos:
-            response_selected_todos.append(
-                {
-                    "id": selected_todo.id,
-                    "title": selected_todo.title,
-                    "required_time": selected_todo.required_time,
-                    "notes": selected_todo.notes,
-                }
-            )
 
     response = {
         "free_time_id": free_time_id,
         "suggest_todos": response_suggest_todos,
-        "selected_todos": response_selected_todos,
     }
 
     return response

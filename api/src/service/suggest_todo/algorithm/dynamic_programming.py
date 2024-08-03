@@ -52,14 +52,15 @@ class DPAlgorithm:
         selected_todos.reverse()
         return selected_todos
 
-    def execute(self) -> list[SuggestTodoVO]:
+    def execute(self) -> list[Todo]:
         self.__converted_todos = convert_todos(self.todos, self._culc_value)
 
         duration = self.free_time.get_duration()
-        suggest_todos = self.__knapsack(self.__converted_todos, duration)
-        for todo in suggest_todos:
-            well_todo = SuggestTodoVO(
-                free_time=self.free_time, todo=revert_todo(todo, self.todos)
-            )
-            self.well_todos.append(well_todo)
-        return self.well_todos
+        converted_suggest_todos = self.__knapsack(self.__converted_todos, duration)
+
+        suggest_todos = [
+            revert_todo(converted_suggest_todo, self.todos)
+            for converted_suggest_todo in converted_suggest_todos
+        ]
+
+        return suggest_todos

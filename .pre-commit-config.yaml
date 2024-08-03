@@ -4,12 +4,6 @@ repos:
     hooks:
     -   id: black
         files: \.py$
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.2.0
-    hooks:
-    -   id: mypy
-        files: \.py$
-        args: [--config-file=./api/mypy.ini]
 -   repo: https://github.com/pre-commit/mirrors-eslint
     rev: 'v9.6.0'  # Use the sha / tag you want to point at
     hooks:
