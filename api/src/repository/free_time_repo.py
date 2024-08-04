@@ -1,6 +1,4 @@
 from sqlalchemy.future import select
-from sqlalchemy import update, delete
-from sqlalchemy.orm import selectinload
 
 from src.models.free_time_model import FreeTimeModel
 
@@ -8,7 +6,7 @@ from pydantic import BaseModel
 from typing import Any
 from src.domain.entities.free_time import FreeTime
 
-from datetime import datetime
+from datetime import datetime, date
 import pytz
 
 
@@ -34,12 +32,18 @@ class FreeTimeMapper:
 class FreeTimeRepo(BaseModel):
     session: Any
 
-    async def fetch_today(self) -> list[FreeTime]:
-        tz_tokyo = pytz.timezone("Asia/Tokyo")
-        today_start = datetime.now(tz_tokyo).replace(
-            hour=0, minute=0, second=0, microsecond=0
+    async def fetch_by_date(self, target_date: date, user_id: str) -> list[FreeTime]:
+        start_of_day = datetime.combine(
+            target_date, datetime.min.time(), tzinfo=pytz.timezone("Asia/Tokyo")
         )
-        stmt = select(FreeTimeModel).where(FreeTimeModel.start >= today_start)
+        end_of_day = datetime.combine(
+            target_date, datetime.max.time(), tzinfo=pytz.timezone("Asia/Tokyo")
+        )
+        stmt = select(FreeTimeModel).where(
+            FreeTimeModel.user_id == user_id,
+            FreeTimeModel.start >= start_of_day,
+            FreeTimeModel.end <= end_of_day,
+        )
         result = await self.session.execute(stmt)
         free_time_models = result.scalars().all()
         if free_time_models:
@@ -64,3 +68,21 @@ class FreeTimeRepo(BaseModel):
             return FreeTimeMapper.to_entity(free_time_model)
         else:
             return None
+
+    async def delete_by_date(self, target_date: date, user_id: str):
+        start_of_day = datetime.combine(
+            target_date, datetime.min.time(), tzinfo=pytz.timezone("Asia/Tokyo")
+        )
+        end_of_day = datetime.combine(
+            target_date, datetime.max.time(), tzinfo=pytz.timezone("Asia/Tokyo")
+        )
+        stmt = select(FreeTimeModel).where(
+            FreeTimeModel.user_id == user_id,
+            FreeTimeModel.start >= start_of_day,
+            FreeTimeModel.end <= end_of_day,
+        )
+        result = await self.session.execute(stmt)
+        free_time_models = result.scalars().all()
+        for free_time_model in free_time_models:
+            await self.session.delete(free_time_model)
+        await self.session.commit()

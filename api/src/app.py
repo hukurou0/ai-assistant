@@ -10,6 +10,9 @@ from src.service.user import UserService
 
 from src.const import request_params
 
+from datetime import datetime
+import pytz
+
 
 # ルートエンドポイント
 @app.get("/")
@@ -99,10 +102,11 @@ async def remove_selected_todo(
 
 @app.get("/schedule")
 async def get_schedule(
+    need_sync: bool,
     db: AsyncSession = Depends(get_db_session),
     user_id: str = Depends(get_current_user_id),
 ):
-    schedule = await ScheduleService(session=db).get(user_id)
+    schedule = await ScheduleService(session=db).get_today(user_id, need_sync)
     sorted_elements = schedule.get_elements_sorted_by_time()
     response_schedule = []
     for sorted_element in sorted_elements:
@@ -113,9 +117,12 @@ async def get_schedule(
                     "id": sorted_element.id,
                     "summary": sorted_element.summary,
                     "description": sorted_element.description,
-                    "start": sorted_element.start,
-                    "end": sorted_element.end,
-                    "now": True,
+                    "time": sorted_element.start.strftime("%H:%M")
+                    + " - "
+                    + sorted_element.end.strftime("%H:%M"),
+                    "now": sorted_element.start
+                    <= datetime.now(pytz.timezone("Asia/Tokyo"))
+                    <= sorted_element.end,
                 }
             )
         elif sorted_element.__class__.__name__ == "FreeTime":
@@ -123,9 +130,12 @@ async def get_schedule(
                 {
                     "type": "free_time",
                     "id": sorted_element.id,
-                    "start": sorted_element.start,
-                    "end": sorted_element.end,
-                    "now": False,
+                    "time": sorted_element.start.strftime("%H:%M")
+                    + " - "
+                    + sorted_element.end.strftime("%H:%M"),
+                    "now": sorted_element.start
+                    <= datetime.now(pytz.timezone("Asia/Tokyo"))
+                    <= sorted_element.end,
                 }
             )
     return {"schedule": response_schedule}

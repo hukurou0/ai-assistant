@@ -9,7 +9,7 @@ class SuggestTodoModel(Base):
 
     id = Column(String, primary_key=True)
     todo_id = Column(String, ForeignKey("todo.id"))
-    free_time_id = Column(String, ForeignKey("free_time.id"))
+    free_time_id = Column(String, ForeignKey("free_time.id", ondelete="CASCADE"))
     selected = Column(Boolean)
 
     todo = relationship("TodoModel", back_populates="suggest_todo")

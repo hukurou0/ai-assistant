@@ -7,7 +7,6 @@ type props = {
     id: string,
     now: boolean,
     time: string,
-    selectedTodos: string[]
   }
 }
 

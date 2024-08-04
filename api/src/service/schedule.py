@@ -5,7 +5,8 @@ from src.domain.entities.schedule import Schedule
 from src.domain.entities.free_time import FreeTime
 from src.domain.entities.user import User
 
-from src.repository.calendar_repo import CalendarRepo
+from src.repository.google_calendar_repo import GoogleCalendarRepo
+from src.repository.event_repo import EventRepo
 from src.repository.free_time_repo import FreeTimeRepo
 from src.repository.user_repo import UserRepo
 
@@ -13,6 +14,7 @@ from src.service.shared.utils.make_uuid import make_uuid
 
 from datetime import datetime, timedelta
 import pytz
+from src.util.handle_time import get_today_date
 
 
 class ScheduleService(BaseModel):
@@ -38,6 +40,8 @@ class ScheduleService(BaseModel):
                 hour=start_time, minute=0, second=0, microsecond=0
             )
             end += timedelta(days=1)
+        else:
+            now = now.replace(hour=start_time, minute=0, second=0, microsecond=0)
         start_of_free_time = now
 
         for event in events:
@@ -63,22 +67,37 @@ class ScheduleService(BaseModel):
         return free_times
 
     async def sync(self, user: User):
-        calendar_repo = CalendarRepo(session=self.session)
+        google_calendar_repo = GoogleCalendarRepo(session=self.session)
+        event_repo = EventRepo(session=self.session)
         free_time_repo = FreeTimeRepo(session=self.session)
-        events = await calendar_repo.get(user)
+        events = await google_calendar_repo.get(user)
+        await event_repo.save(events, user_id=user.id)
         free_times = await self._find_free_time(events)
         await free_time_repo.save(free_times, user_id=user.id)
 
-    async def get(self, user_id: str):  # TODO# need_syncの制御
-        user_repo = UserRepo(session=self.session)
-        user = await user_repo.fetch_user_by_id(user_id)
-
-        need_sync = True
-        if need_sync:
-            await self.sync(user)
-        calendar_repo = CalendarRepo(session=self.session)
+    async def get_today(self, user_id: str, need_sync: bool) -> Schedule:
+        today_date = get_today_date()
+        event_repo = EventRepo(session=self.session)
         free_time_repo = FreeTimeRepo(session=self.session)
-        events = await calendar_repo.get(user)
-        free_times = await free_time_repo.fetch_today()
-        schedule = Schedule(id=make_uuid(), events=events, free_times=free_times)
+
+        if need_sync:
+            await free_time_repo.delete_by_date(today_date, user_id)
+            await event_repo.delete_by_date(today_date, user_id)
+            user_repo = UserRepo(session=self.session)
+            user = await user_repo.fetch_user_by_id(user_id)
+            await self.sync(user)
+
+        events = await event_repo.fecth_by_date(today_date, user_id)
+        free_times = await free_time_repo.fetch_by_date(today_date, user_id)
+
+        # イベントも空き時間もない場合は、一度も同期されていないので同期して再取得
+        # メモ # バグの原因となる可能性があるコード
+        if not (events) and not (free_times):
+            user_repo = UserRepo(session=self.session)
+            user = await user_repo.fetch_user_by_id(user_id)
+            await self.sync(user)
+            events = await event_repo.fecth_by_date(today_date, user_id)
+            free_times = await free_time_repo.fetch_by_date(today_date, user_id)
+
+        schedule = Schedule(id="dumy", events=events, free_times=free_times)
         return schedule

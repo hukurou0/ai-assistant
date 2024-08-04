@@ -1,7 +1,3 @@
-from sqlalchemy.future import select
-from sqlalchemy import update, delete
-from sqlalchemy.orm import selectinload
-
 from pydantic import BaseModel
 from typing import Any
 from src.domain.entities.event import Event
@@ -16,7 +12,7 @@ from datetime import datetime, timedelta
 import pytz
 
 
-class CalendarRepo(GoogleBase, BaseModel):
+class GoogleCalendarRepo(GoogleBase, BaseModel):
     session: Any
 
     def _parse_event(self, event) -> Event:

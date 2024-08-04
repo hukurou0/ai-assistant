@@ -19,6 +19,7 @@ declare module 'next-auth/jwt' {
 export const HOST = process.env.REACT_API_HOST;
 
 export const AxiosUtil = {
+  server:{
     async createBase(): Promise<AxiosInstance> {
         const session = await getServerSession(authOptions)
         let headers = {}
@@ -40,4 +41,20 @@ export const AxiosUtil = {
         })
         return axiosBase;
     }
+  },
+
+  client:{
+    async createBase(): Promise<AxiosInstance> {
+      const headers =  {
+        'Content-Type': 'application/json', 
+      }
+      
+      const axiosBase = axios.create({
+        baseURL: '/api',
+        headers: headers,
+        responseType: 'json'
+      })
+      return axiosBase;
+    }
+  }
 }
