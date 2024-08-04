@@ -24,10 +24,13 @@ type ScheduleData = EventData | FreeTimeData
 type ScheduleDataList = ScheduleData[]
 
 type Props = { //仮の型
-  datas: ScheduleDataList
+  datas: {
+    schedule: ScheduleDataList
+  }
 }
 
 export default function Timetable(props: Props) {
+  console.log(props.datas)
   const initialSchedule = [
     {
       type: 'event',
@@ -77,7 +80,7 @@ export default function Timetable(props: Props) {
 
   return (
       <ol className="relative border-s border-gray-200 dark:border-gray-700"> 
-        {initialSchedule.map((schedule) => {
+        {props.datas.schedule.map((schedule) => {
           if (isEventData(schedule)) {
             return <Event key={schedule.id} data={schedule}/>;
           } else if (isFreeTimeData(schedule)) {
