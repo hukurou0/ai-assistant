@@ -8,7 +8,7 @@ from src.service.shared.provider.evaluation.gpt4omini.gpt4omini_evaluation impor
     GPT4OMiniEvaluationProvider,
 )
 
-import datetime
+from src.util.handle_time import get_now_datetime
 
 
 class SyncTodoService(BaseModel):
@@ -35,18 +35,14 @@ class SyncTodoService(BaseModel):
                 await GPT4OMiniEvaluationProvider(
                     session=self.session
                 ).evaluation_todo_in_list(user_todo_list)
-                user_todo_list.last_evaluation = datetime.datetime.now(
-                    tz=datetime.timezone.utc
-                )
+                user_todo_list.last_evaluation = get_now_datetime()
                 await todo_list_repo.update_list(user_todo_list)
             # 評価実行-todoの内容に変更があり
             elif user_todo_list.updated > user_todo_list.last_evaluation:
                 await GPT4OMiniEvaluationProvider(
                     session=self.session
                 ).evaluation_todo_in_list(user_todo_list)
-                user_todo_list.last_evaluation = datetime.datetime.now(
-                    tz=datetime.timezone.utc
-                )
+                user_todo_list.last_evaluation = get_now_datetime()
                 await todo_list_repo.update_list(user_todo_list)
             # 再評価の必要なし
             else:

@@ -10,8 +10,7 @@ from src.service.user import UserService
 
 from src.const import request_params
 
-from datetime import datetime
-import pytz
+from src.util.handle_time import get_now_datetime
 
 
 # ルートエンドポイント
@@ -121,7 +120,7 @@ async def get_schedule(
                     + " - "
                     + sorted_element.end.strftime("%H:%M"),
                     "now": sorted_element.start
-                    <= datetime.now(pytz.timezone("Asia/Tokyo"))
+                    <= get_now_datetime()
                     <= sorted_element.end,
                 }
             )
@@ -134,7 +133,7 @@ async def get_schedule(
                     + " - "
                     + sorted_element.end.strftime("%H:%M"),
                     "now": sorted_element.start
-                    <= datetime.now(pytz.timezone("Asia/Tokyo"))
+                    <= get_now_datetime()
                     <= sorted_element.end,
                 }
             )

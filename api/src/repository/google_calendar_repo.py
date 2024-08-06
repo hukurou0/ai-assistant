@@ -10,6 +10,7 @@ from googleapiclient.errors import HttpError
 
 from datetime import datetime, timedelta
 import pytz
+from src.util.handle_time import get_now_datetime
 
 
 class GoogleCalendarRepo(GoogleBase, BaseModel):
@@ -39,8 +40,7 @@ class GoogleCalendarRepo(GoogleBase, BaseModel):
             service = build("calendar", "v3", credentials=creds)
 
             # Call the Calendar API
-            tz_tokyo = pytz.timezone("Asia/Tokyo")
-            now = datetime.now(tz_tokyo)
+            now = get_now_datetime()
             end = now.replace(hour=20, minute=0, second=0, microsecond=0)
             # 現在時刻が20:00を過ぎている場合は、次の日の20:00を設定
             if now > end:

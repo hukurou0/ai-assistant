@@ -14,7 +14,7 @@ from src.service.shared.utils.make_uuid import make_uuid
 
 from datetime import datetime, timedelta
 import pytz
-from src.util.handle_time import get_today_date
+from src.util.handle_time import get_today_date, get_now_datetime
 
 
 class ScheduleService(BaseModel):
@@ -29,8 +29,7 @@ class ScheduleService(BaseModel):
         end_time: int = 20,
     ) -> list[FreeTime]:
         free_times: list[FreeTime] = []
-        tz_tokyo = pytz.timezone("Asia/Tokyo")
-        now = datetime.now(tz_tokyo)
+        now = get_now_datetime()
         # TODO# 終了時間調整できるように
         end = now.replace(hour=end_time, minute=0, second=0, microsecond=0)
 
