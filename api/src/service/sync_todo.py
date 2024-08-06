@@ -28,7 +28,6 @@ class SyncTodoService(BaseModel):
             else:
                 await todo_list_repo.create_list_with_todos(todo_list, user)
         user_todo_lists = await todo_list_repo.fetch_user_lists_with_todos(user)
-        # TODO# なぜかuser_todo_list.last_evaluationがDBにデータがあってもNoneになっている。そのため毎回新規作成が走る。修正必要
         for user_todo_list in user_todo_lists:
             # 評価実行-新規作成のリスト
             if not user_todo_list.last_evaluation:

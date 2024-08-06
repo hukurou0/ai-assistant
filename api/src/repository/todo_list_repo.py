@@ -126,15 +126,19 @@ class TodoListRepo(BaseModel):
 
     async def update_list(self, todo_list_entity: TodoList):
         # listのupdate
+        values = {
+            "title": todo_list_entity.title,
+            "updated": todo_list_entity.updated,
+        }
+        if not todo_list_entity.last_evaluation:
+            values["last_evaluation"] = todo_list_entity.updated
+
         stmt = (
             update(TodoListModel)
             .where(TodoListModel.id == todo_list_entity.id)
-            .values(
-                title=todo_list_entity.title,
-                updated=todo_list_entity.updated,
-                last_evaluation=todo_list_entity.last_evaluation,
-            )
+            .values(**values)
         )
+
         await self.session.execute(stmt)
         await self.session.commit()
 
@@ -145,6 +149,7 @@ class TodoListRepo(BaseModel):
         ):
             return
 
+        # todoのupdate
         stmt = select(TodoListModel).where(TodoListModel.id == todo_list_entity.id)
         result = await self.session.execute(stmt)
         todo_list_model = result.scalars().one()
