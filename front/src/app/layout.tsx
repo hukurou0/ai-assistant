@@ -19,7 +19,6 @@ export const metadata = {
       { url: '/icons/hukurou.png', sizes: '512x512' },
     ],
   },
-  themeColor: '#000000',
 };
 
 export const viewport = 'width=device-width, initial-scale=1';
