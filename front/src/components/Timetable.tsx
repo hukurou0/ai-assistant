@@ -4,15 +4,15 @@ import { useEffect, useState } from 'react';
 import Event from './Event'
 import FreeTime from './FreeTime';
 import { ScheduleDataList, ScheduleData, EventData, FreeTimeData, FetchData} from '@/app/api/schedule/route';
-import { AxiosUtil } from '@/util/axios-base';
+import { ClientAxiosUtil } from '@/util/axios-base';
 
 export default function Timetable() {
   const [schedule, setSchedule] = useState<ScheduleDataList | null>(null);
 
   const fetchSchedule = async (needSync:boolean) => {
     try {
-      const axios = await AxiosUtil.client.createBase();
-      const response = await axios.get('/schedule',{
+      const axiosBase = new ClientAxiosUtil();
+      const response = await axiosBase.get('/schedule',{
         params: {
           "need_sync": needSync
         }
@@ -23,7 +23,6 @@ export default function Timetable() {
         console.error('Failed to fetch schedule');
         return {schedule: []} as FetchData;
       }
-      console.log('response:', response.data);
       return response.data as FetchData;
     } catch (error) {
       console.error('Failed to fetch schedule:', error);
@@ -37,7 +36,6 @@ export default function Timetable() {
       if (!data.schedule || data.schedule.length === 0) {
         data =  await fetchSchedule(true);
       }
-      console.log('data:', data);
       setSchedule(data.schedule);
     }
     fetchData();

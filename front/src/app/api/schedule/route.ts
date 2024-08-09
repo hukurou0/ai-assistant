@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AxiosUtil } from '@/util/axios-base';
-import { AxiosResponse } from 'axios';
+import { ServerAxiosUtil } from '@/util/axios-base';
 
 export interface EventData {
   type: string;
@@ -30,11 +29,11 @@ export const GET = async (request: NextRequest) => {
   const needSync = searchParams.get('need_sync') === 'true';
 
   try {
-    const axios = await AxiosUtil.server.createBase();
-    const response: AxiosResponse<FetchData> = await axios.get('/schedule', {
+    const axiosBase = new ServerAxiosUtil();
+    const response = await axiosBase.get('schedule', {
       params: {
-        need_sync: needSync,
-      },
+        need_sync: needSync
+      }
     });
     return NextResponse.json(response.data);
   } catch (error) {
