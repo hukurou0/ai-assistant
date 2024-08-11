@@ -26,3 +26,9 @@ class UserService(BaseModel):
             await repo.save(user)
         tokens = await JWTProvider().get_jwt_from_user_id(user.id)
         return tokens
+
+    async def token_refresh(self, refresh_token: str) -> str:
+        new_access_token, access_token_expires_in = (
+            await JWTProvider().refresh_access_token(refresh_token)
+        )
+        return new_access_token, access_token_expires_in

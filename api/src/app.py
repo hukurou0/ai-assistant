@@ -152,13 +152,20 @@ async def signup(
     return {
         "access_token": tokens["access_token"],
         "refresh_token": tokens["refresh_token"],
+        "access_token_expires_in": tokens["access_token_expires_in"],
+        "refresh_token_expires_in": tokens["refresh_token_expires_in"],
     }
 
 
-@app.get("/check")
-async def check(
-    user_id: str = Depends(get_current_user_id),
+@app.post("/refresh")
+async def refresh(
+    request_body: request_params.RefreshTokenParams,
     db: AsyncSession = Depends(get_db_session),
 ):
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTA3ODA0MDg1Njk5NjI4ODg4NTg5In0.Vu9PjOAGDmF5XjWZwg4l5UpdTcUYjzoEkHtSj1qq_PE"
-    user = await UserService(session=db).get_user_by_id(user_id)
+    new_access_token, access_token_expires_in = await UserService(
+        session=db
+    ).token_refresh(request_body.refresh_token)
+    return {
+        "access_token": new_access_token,
+        "access_token_expires_in": access_token_expires_in,
+    }

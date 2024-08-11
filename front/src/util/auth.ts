@@ -1,7 +1,8 @@
 import { Account, NextAuthOptions, Session } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import { JWT } from 'next-auth/jwt'
-import { ServerAxiosUtil } from './axios-base'
+import { HOST, ServerAxiosUtil } from './axios-base'
+import axios from 'axios'
 
 const fetchAppTokenFromGoogleToken = async (token:JWT, googleAccessToken: string, googleRefreshToken: string) => {
   const data = {
@@ -24,57 +25,44 @@ const fetchAppTokenFromGoogleToken = async (token:JWT, googleAccessToken: string
 }
 
 const refreshAccessToken = async (token: JWT) => {
-  console.log('Refreshing access token')
+  let response = null
   try {
-    let response = null
-    try {
-      const axiosBase = new ServerAxiosUtil()
-      response = await axiosBase.post('refresh', {
-        refresh_token: token.refreshToken,
-      })
-    } catch (error) {
-      console.error('Error sending token:', error)
+    const headers = {
+      'Content-Type': 'application/json'
     }
-    console.log('Access token refreshed')
-    if (!response) {
-      console.error('Failed to refresh access token')
-      return {
-        ...token,
-        error: 'RefreshFailedError'
-      }
+    const data = {
+      refresh_token: token.refreshToken
     }
-    const refreshedTokens = response.data
-
-    if (!refreshedTokens || !refreshedTokens.access_token) {
-      console.error('Failed to refresh access token')
-      return {
-        ...token,
-        error: 'RefreshFailedError'
-      }
-    }
-
-    return {
-      ...token,
-      accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.access_token_expires_in * 1000,
-    }
+    // ServerAxiosUtilを使うと、getServerSessionにより無限ループが発生するため、axiosを直接使用
+    response = await axios.post(HOST + 'refresh', data, { headers: headers })
   } catch (error) {
-    console.error('Error refreshing access token', error)
+    console.error('Error sending token:', error)
+  }
 
+  if (!response) {
+    console.error('Failed to refresh access token')
     return {
       ...token,
-      error: 'RefreshAccessTokenError'
+      error: 'RefreshFailedError'
     }
   }
+
+  const refreshedTokens = response.data
+
+  if (!refreshedTokens || !refreshedTokens.access_token) {
+    console.error('Failed to refresh access token')
+    return {
+      ...token,
+      error: 'RefreshFailedError'
+    }
+  }
+
+  return {
+    ...token,
+    accessToken: refreshedTokens.access_token,
+    accessTokenExpires: Date.now() + refreshedTokens.access_token_expires_in * 1000,
+  }
 }
-
-const tmp = async (token:JWT) => {
-  console.log('tmp')
-  
-
-  return token
-}
-
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -106,13 +94,11 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
+        // アクセストークンの有効期限が切れていたらリフレッシュ
         if (token.accessTokenExpires && Date.now() > token.accessTokenExpires) {
-          console.log('Access token has expired, refreshing')
-          token.accessTokenExpires += 100
-          return token
+          const new_token = await refreshAccessToken(token)         
+          return new_token
         }
-
-        console.log('token is not expired')
 
         return token
       },
