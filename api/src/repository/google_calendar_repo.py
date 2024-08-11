@@ -10,7 +10,7 @@ from googleapiclient.errors import HttpError
 
 from datetime import datetime, timedelta
 import pytz
-from src.util.handle_time import get_now_datetime
+from src.util.handle_time import get_today_date, get_start_of_datetime
 
 
 class GoogleCalendarRepo(GoogleBase, BaseModel):
@@ -40,11 +40,13 @@ class GoogleCalendarRepo(GoogleBase, BaseModel):
             service = build("calendar", "v3", credentials=creds)
 
             # Call the Calendar API
-            now = get_now_datetime()
-            end = now.replace(hour=20, minute=0, second=0, microsecond=0)
+            start_of_day = get_start_of_datetime(get_today_date())
+            end_of_day = start_of_day.replace(
+                hour=20, minute=0, second=0, microsecond=0
+            )
             # 現在時刻が20:00を過ぎている場合は、次の日の20:00を設定
-            if now > end:
-                end += timedelta(days=1)
+            if start_of_day > end_of_day:
+                end_of_day += timedelta(days=1)
 
             calendar_list = service.calendarList().list().execute()
             events = []
@@ -54,8 +56,8 @@ class GoogleCalendarRepo(GoogleBase, BaseModel):
                     service.events()
                     .list(
                         calendarId=calendar_id,
-                        timeMin=now.isoformat(),
-                        timeMax=end.isoformat(),
+                        timeMin=start_of_day.isoformat(),
+                        timeMax=end_of_day.isoformat(),
                         singleEvents=True,
                         orderBy="startTime",
                     )

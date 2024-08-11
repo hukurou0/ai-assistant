@@ -12,9 +12,7 @@ from src.repository.user_repo import UserRepo
 
 from src.service.shared.utils.make_uuid import make_uuid
 
-from datetime import datetime, timedelta
-import pytz
-from src.util.handle_time import get_today_date, get_now_datetime
+from src.util.handle_time import get_today_date, get_start_end_time
 
 
 class ScheduleService(BaseModel):
@@ -29,23 +27,11 @@ class ScheduleService(BaseModel):
         end_time: int = 20,
     ) -> list[FreeTime]:
         free_times: list[FreeTime] = []
-        now = get_now_datetime()
-        # TODO# 終了時間調整できるように
-        end = now.replace(hour=end_time, minute=0, second=0, microsecond=0)
-
-        # 現在時刻がend_timeを過ぎている場合は、次の日のstart_timeからend_timeの中でfind_free_time
-        if now > end:
-            now = (now + timedelta(days=1)).replace(
-                hour=start_time, minute=0, second=0, microsecond=0
-            )
-            end += timedelta(days=1)
-        else:
-            now = now.replace(hour=start_time, minute=0, second=0, microsecond=0)
-        start_of_free_time = now
+        start, end = get_start_end_time(get_today_date(), start_time, end_time)
 
         for event in events:
             start_of_event = event.start
-            if start_of_free_time < start_of_event:
+            if start < start_of_event:
                 duration = (start_of_event - start_of_free_time).total_seconds() / 60
                 if duration >= min_duration:
                     free_times.append(
@@ -54,7 +40,7 @@ class ScheduleService(BaseModel):
                         )
                     )
             end_of_event = event.end
-            start_of_free_time = max(start_of_free_time, end_of_event)
+            start_of_free_time = max(start, end_of_event)
 
         # 最後のイベント後の空き時間も追加
         duration = (end - start_of_free_time).total_seconds() / 60

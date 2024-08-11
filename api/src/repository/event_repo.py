@@ -6,8 +6,10 @@ from src.domain.entities.event import Event
 
 from src.models.event_model import EventModel
 
-from datetime import date, datetime
+from datetime import date, timedelta
 import pytz
+
+from src.util.handle_time import get_start_of_datetime
 
 
 class EventMapper:
@@ -43,12 +45,8 @@ class EventRepo(BaseModel):
         await self.session.commit()
 
     async def fecth_by_date(self, target_date: date, user_id: str) -> list[Event]:
-        start_of_day = datetime.combine(
-            target_date, datetime.min.time(), tzinfo=pytz.timezone("Asia/Tokyo")
-        )
-        end_of_day = datetime.combine(
-            target_date, datetime.max.time(), tzinfo=pytz.timezone("Asia/Tokyo")
-        )
+        start_of_day = get_start_of_datetime(target_date)
+        end_of_day = start_of_day + timedelta(days=1)
         stmt = select(EventModel).where(
             EventModel.user_id == user_id,
             EventModel.start >= start_of_day,
@@ -62,12 +60,8 @@ class EventRepo(BaseModel):
             return []
 
     async def delete_by_date(self, target_date: date, user_id: str):
-        start_of_day = datetime.combine(
-            target_date, datetime.min.time(), tzinfo=pytz.timezone("Asia/Tokyo")
-        )
-        end_of_day = datetime.combine(
-            target_date, datetime.max.time(), tzinfo=pytz.timezone("Asia/Tokyo")
-        )
+        start_of_day = get_start_of_datetime(target_date)
+        end_of_day = start_of_day + timedelta(days=1)
         stmt = select(EventModel).where(
             EventModel.user_id == user_id,
             EventModel.start >= start_of_day,

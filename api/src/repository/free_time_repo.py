@@ -6,8 +6,10 @@ from pydantic import BaseModel
 from typing import Any
 from src.domain.entities.free_time import FreeTime
 
-from datetime import datetime, date
+from datetime import date, timedelta
 import pytz
+
+from src.util.handle_time import get_start_of_datetime
 
 
 class FreeTimeMapper:
@@ -33,12 +35,8 @@ class FreeTimeRepo(BaseModel):
     session: Any
 
     async def fetch_by_date(self, target_date: date, user_id: str) -> list[FreeTime]:
-        start_of_day = datetime.combine(
-            target_date, datetime.min.time(), tzinfo=pytz.timezone("Asia/Tokyo")
-        )
-        end_of_day = datetime.combine(
-            target_date, datetime.max.time(), tzinfo=pytz.timezone("Asia/Tokyo")
-        )
+        start_of_day = get_start_of_datetime(target_date)
+        end_of_day = start_of_day + timedelta(days=1)
         stmt = select(FreeTimeModel).where(
             FreeTimeModel.user_id == user_id,
             FreeTimeModel.start >= start_of_day,
@@ -70,12 +68,8 @@ class FreeTimeRepo(BaseModel):
             return None
 
     async def delete_by_date(self, target_date: date, user_id: str):
-        start_of_day = datetime.combine(
-            target_date, datetime.min.time(), tzinfo=pytz.timezone("Asia/Tokyo")
-        )
-        end_of_day = datetime.combine(
-            target_date, datetime.max.time(), tzinfo=pytz.timezone("Asia/Tokyo")
-        )
+        start_of_day = get_start_of_datetime(target_date)
+        end_of_day = start_of_day + timedelta(days=1)
         stmt = select(FreeTimeModel).where(
             FreeTimeModel.user_id == user_id,
             FreeTimeModel.start >= start_of_day,
