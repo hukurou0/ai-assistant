@@ -1,16 +1,13 @@
 import React from 'react'
-import SelectedTodos from './SelectedTodos'
+import SuggestTodoList from './SuggestTodoList'
+import { FreeTimeData } from '@/app/api/schedule/route'
 
 type props = {
-  data:{
-    type: string,
-    id: string,
-    now: boolean,
-    time: string,
-  }
+  data:FreeTimeData
 }
 
 export default function FreeTime(props: props) {
+  console.log(props.data)
   return (
     <li className="mb-7 ms-6">            
         <span className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
@@ -24,7 +21,7 @@ export default function FreeTime(props: props) {
           )}
         </h3>
         <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">{props.data.time}</time>
-        <SelectedTodos />
+        <SuggestTodoList id={props.data.id}/>
     </li>
   )
 }
