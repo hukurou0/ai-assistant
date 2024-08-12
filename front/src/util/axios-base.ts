@@ -8,6 +8,7 @@ declare module 'next-auth' {
     refreshToken?: string;
     accessTokenExpires?: number;
     refreshTokenExpires?: number;
+    error?: string;
   }
 }
 
@@ -17,6 +18,7 @@ declare module 'next-auth/jwt' {
     refreshToken?: string;
     accessTokenExpires?: number;
     refreshTokenExpires?: number;
+    error?: string;
   }
 }
 

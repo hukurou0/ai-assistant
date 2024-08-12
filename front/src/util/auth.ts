@@ -94,6 +94,14 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
+        // リフレッシュトークンの有効期限が切れていたらsessionをクリア
+        if (token.refreshTokenExpires && Date.now() > token.refreshTokenExpires) {
+          return {
+            ...token,
+            error: 'RefreshTokenExpiredError'
+          }
+        }
+
         // アクセストークンの有効期限が切れていたらリフレッシュ
         if (token.accessTokenExpires && Date.now() > token.accessTokenExpires) {
           const new_token = await refreshAccessToken(token)         
@@ -105,6 +113,7 @@ export const authOptions: NextAuthOptions = {
       async session({ session, token }: { session: Session, token: JWT }) {
         session.accessToken = token.accessToken
         session.refreshToken = token.refreshToken
+        session.error = token.error
         return session
       },
       async signIn({ account }: { account: Account | null}) {
