@@ -10,7 +10,7 @@ from src.repository.event_repo import EventRepo
 from src.repository.free_time_repo import FreeTimeRepo
 from src.repository.user_repo import UserRepo
 
-from src.service.shared.utils.make_uuid import make_uuid
+from src.util.make_uuid import make_uuid
 
 from src.util.handle_time import get_today_date, get_start_end_time
 

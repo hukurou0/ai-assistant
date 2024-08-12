@@ -8,7 +8,7 @@ from src.repository.free_time_repo import FreeTimeRepo
 
 from datetime import datetime
 import pytz
-from src.service.shared.utils.make_uuid import make_uuid
+from src.util.make_uuid import make_uuid
 
 
 class SelectedTodosService(BaseModel):

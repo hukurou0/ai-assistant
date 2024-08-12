@@ -10,7 +10,7 @@ from src.repository.suggest_todo_repo import SuggestTodoRepo
 
 from src.service.suggest_todo.algorithm.dynamic_programming import DPAlgorithm
 
-from src.service.shared.utils.make_uuid import make_uuid
+from src.util.make_uuid import make_uuid
 
 
 class SuggestTodoService(BaseModel):
