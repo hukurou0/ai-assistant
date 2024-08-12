@@ -7,7 +7,6 @@ type props = {
 }
 
 export default function FreeTime(props: props) {
-  console.log(props.data)
   return (
     <li className="mb-7 ms-6">            
         <span className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
