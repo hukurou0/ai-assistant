@@ -29,18 +29,18 @@ class ScheduleService(BaseModel):
         free_times: list[FreeTime] = []
         start, end = get_start_end_time(get_today_date(), start_time, end_time)
 
+        start_of_free_time = start
         for event in events:
             start_of_event = event.start
-            if start < start_of_event:
-                duration = (start_of_event - start_of_free_time).total_seconds() / 60
-                if duration >= min_duration:
-                    free_times.append(
-                        FreeTime(
-                            id=make_uuid(), start=start_of_free_time, end=start_of_event
-                        )
+            duration = (start_of_event - start_of_free_time).total_seconds() / 60
+            if duration >= min_duration:
+                free_times.append(
+                    FreeTime(
+                        id=make_uuid(), start=start_of_free_time, end=start_of_event
                     )
+                )
             end_of_event = event.end
-            start_of_free_time = max(start, end_of_event)
+            start_of_free_time = end_of_event
 
         # 最後のイベント後の空き時間も追加
         duration = (end - start_of_free_time).total_seconds() / 60
@@ -75,14 +75,8 @@ class ScheduleService(BaseModel):
         events = await event_repo.fecth_by_date(today_date, user_id)
         free_times = await free_time_repo.fetch_by_date(today_date, user_id)
 
-        # イベントも空き時間もない場合は、一度も同期されていないので同期して再取得
-        # メモ # バグの原因となる可能性があるコード
         if not (events) and not (free_times):
-            user_repo = UserRepo(session=self.session)
-            user = await user_repo.fetch_user_by_id(user_id)
-            await self.sync(user)
-            events = await event_repo.fecth_by_date(today_date, user_id)
-            free_times = await free_time_repo.fetch_by_date(today_date, user_id)
+            return None
 
         schedule = Schedule(id="dumy", events=events, free_times=free_times)
         return schedule
