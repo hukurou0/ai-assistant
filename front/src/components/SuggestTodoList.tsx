@@ -28,8 +28,10 @@ export default function SuggestTodoList(props: {id:string}) {
 
   useEffect(() => {
     const fetchData = async () => {
-      let data = await fetchSuggestTodos(props.id);
-      setSuggestTodos(data.suggest_todos);
+      const data = await fetchSuggestTodos(props.id);
+      if (typeof data !== 'undefined' && 'suggest_todos' in data) {
+        setSuggestTodos(data.suggest_todos);
+      }
     }
     fetchData();
   }, []);
