@@ -94,4 +94,14 @@ export class ClientAxiosUtil {
         throw error;
     }
   }
+
+  async post(url: string, config = {}) {
+    try {
+        const response = await this.client.post(url, config);
+        return response;
+    } catch (error) {
+        console.error('POSTリクエストでエラーが発生:', error);
+        throw error;
+    }
+  }
 }

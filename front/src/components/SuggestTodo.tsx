@@ -1,18 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import { SuggestTodoData } from '@/app/api/suggest/route';
+import { ClientAxiosUtil } from '@/util/axios-base';
 
 export default function SuggestTodo(props: {data: SuggestTodoData}) {
   const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
     if (props.data) {
-      console.log(props.data.selected);
       setIsChecked(props.data.selected);
     }
   }, [props.data.selected]);
   
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked);
+    const body = {
+      suggest_todo_id: props.data.suggest_todo.id,
+      selected: event.target.checked
+    };
+    const axiosBase = new ClientAxiosUtil();
+    axiosBase.post('suggest/select', body)
+      .then((response) => {})
+      .catch((error) => {
+        console.error('Failed to post todo select:', error);
+      });
   };
 
   return (

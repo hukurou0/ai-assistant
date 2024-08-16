@@ -2,18 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ServerAxiosUtil } from '@/util/axios-base';
 
 export interface SuggestTodoData {
-    suggest_todo: {
-        id: string;
-        title: string;
-        required_time: number;
-        note: string;
-    },
-    selected: boolean;
+  free_time_id: string;
+  suggest_todo: {
+      id: string;
+      title: string;
+      required_time: number;
+      note: string;
+  },
+  selected: boolean;
 }
 
 export type FetchData = {
-    free_time_id: string;
-    suggest_todos: SuggestTodoData[];
+  free_time_id: string;
+  suggest_todos: SuggestTodoData[];
 };
 
 export const GET = async (request: NextRequest) => {

@@ -1,4 +1,5 @@
 from sqlalchemy.future import select
+from sqlalchemy import update
 from sqlalchemy.orm import joinedload
 
 from src.models.suggest_todo_model import SuggestTodoModel
@@ -60,5 +61,15 @@ class SuggestTodoRepo(BaseModel):
         suggest_todo_models = SuggestTodoMapper.to_model(suggest_todos)
         for suggest_todo_model in suggest_todo_models:
             self.session.add(suggest_todo_model)
+        await self.session.commit()
+        return None
+
+    async def set_selected(self, suggest_todo_id: str, selected: bool):
+        stmt = (
+            update(SuggestTodoModel)
+            .where(SuggestTodoModel.id == suggest_todo_id)
+            .values(selected=selected)
+        )
+        await self.session.execute(stmt)
         await self.session.commit()
         return None

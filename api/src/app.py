@@ -73,30 +73,21 @@ async def suggest(
     return response
 
 
-@app.patch("/selected-todo/add")
+@app.post("/suggest/select")
 async def add_selected_todo(
-    request_body: request_params.SelectedTodoAddParams,
+    request_body: request_params.SuggestSelectParams,
     db: AsyncSession = Depends(get_db_session),
     user_id: str = Depends(get_current_user_id),
 ):
-    message = await SelectedTodosService(session=db).add_selected_todo_by_id(
-        request_body.todo_id, request_body.free_time_id
+    message = await SuggestTodoService(session=db).set_selected(
+        request_body.suggest_todo_id, request_body.selected
     )
     if message == "success":
-        return {"todo_id": request_body.todo_id, "message": "success"}
-
-
-@app.patch("/selected-todo/remove")
-async def remove_selected_todo(
-    request_body: request_params.SelectedTodoRemoveParams,
-    db: AsyncSession = Depends(get_db_session),
-    user_id: str = Depends(get_current_user_id),
-):
-    message = await SelectedTodosService(session=db).delete_selected_todo_by_id(
-        request_body.todo_id, request_body.free_time_id
-    )
-    if message == "success":
-        return {"todo_id": request_body.todo_id, "message": "success"}
+        return {
+            "todo_id": request_body.suggest_todo_id,
+            "selected": request_body.selected,
+            "message": "success",
+        }
 
 
 @app.get("/schedule")

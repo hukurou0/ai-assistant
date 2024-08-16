@@ -51,3 +51,8 @@ class SuggestTodoService(BaseModel):
         )
 
         return suggest_todos
+
+    async def set_selected(self, suggest_todo_id: str, selected: bool):
+        suggest_todo_repo = SuggestTodoRepo(session=self.session)
+        await suggest_todo_repo.set_selected(suggest_todo_id, selected)
+        return "success"
