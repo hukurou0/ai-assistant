@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # データベースの接続情報
-database_url = os.getenv("DATABASE_URL")
+database_url = os.getenv("DATABASE_URL").replace(
+    "postgres://", "postgresql+asyncpg://"
+)  # Heroku用の置換
 
 if not database_url:
     raise ValueError("DATABASE_URLが設定されていません。")

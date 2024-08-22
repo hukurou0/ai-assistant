@@ -13,7 +13,9 @@ import os
 load_dotenv()
 
 # データベース設定
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL").replace(
+    "postgres://", "postgresql+asyncpg://"
+)  # Heroku用の置換
 
 # SQLAlchemy用のエンジンを作成
 engine = create_async_engine(
