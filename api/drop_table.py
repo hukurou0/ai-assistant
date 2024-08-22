@@ -8,8 +8,13 @@ from src.models.user_model import UserModel
 from src.models.suggest_todo_model import SuggestTodoModel
 from src.models.event_model import EventModel
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 # データベースの接続情報
-database_url = "postgresql://myuser:mypassword@postgres/mydatabase"
+database_url = os.getenv("DATABASE_URL")
 
 # エンジンの作成
 engine = create_engine(database_url)
