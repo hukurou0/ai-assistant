@@ -1,6 +1,6 @@
 from src.app_setting import app, get_db_session, get_current_user_id
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
 from src.service.suggest_todo.suggest_todo_service import SuggestTodoService
 from src.service.sync_todo import SyncTodoService
@@ -17,6 +17,22 @@ from src.util.handle_time import get_now_datetime
 @app.get("/")
 async def read_root():
     return {"message": "hello_world"}
+
+
+@app.get("/db-init")
+async def db_init():
+    try:
+        # drop_table と create_table をインポートして実行
+        import drop_table
+        import create_table
+
+        # 非同期で実行
+        await drop_table.execute_drop()
+        await create_table.execute_create()
+
+        return {"message": "Database initialized successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # TODO# Google-todoで削除したときにsyncできるように（現状DBに残り続ける）
