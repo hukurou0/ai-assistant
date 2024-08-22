@@ -1,4 +1,5 @@
 from sqlalchemy.future import select
+from sqlalchemy import or_, and_
 
 from pydantic import BaseModel
 from typing import Any
@@ -49,8 +50,11 @@ class EventRepo(BaseModel):
         end_of_day = start_of_day + timedelta(days=1)
         stmt = select(EventModel).where(
             EventModel.user_id == user_id,
-            EventModel.start >= start_of_day,
-            EventModel.end <= end_of_day,
+            or_(
+                and_(EventModel.start >= start_of_day, EventModel.start < end_of_day),
+                and_(EventModel.end > start_of_day, EventModel.end <= end_of_day),
+                and_(EventModel.start < start_of_day, EventModel.end > end_of_day),
+            ),
         )
         result = await self.session.execute(stmt)
         event_models = result.scalars().all()
@@ -64,8 +68,11 @@ class EventRepo(BaseModel):
         end_of_day = start_of_day + timedelta(days=1)
         stmt = select(EventModel).where(
             EventModel.user_id == user_id,
-            EventModel.start >= start_of_day,
-            EventModel.end <= end_of_day,
+            or_(
+                and_(EventModel.start >= start_of_day, EventModel.start < end_of_day),
+                and_(EventModel.end > start_of_day, EventModel.end <= end_of_day),
+                and_(EventModel.start < start_of_day, EventModel.end > end_of_day),
+            ),
         )
         result = await self.session.execute(stmt)
         event_models = result.scalars().all()

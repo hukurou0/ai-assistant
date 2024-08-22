@@ -114,6 +114,7 @@ async def get_schedule(
 ):
     schedule = await ScheduleService(session=db).get_today(user_id, need_sync)
     if not schedule:
+        print("No schedule")
         return {"schedule": None}
 
     sorted_elements = schedule.get_elements_sorted_by_time()

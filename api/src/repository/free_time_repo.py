@@ -1,4 +1,5 @@
 from sqlalchemy.future import select
+from sqlalchemy import or_, and_
 
 from src.models.free_time_model import FreeTimeModel
 
@@ -39,8 +40,16 @@ class FreeTimeRepo(BaseModel):
         end_of_day = start_of_day + timedelta(days=1)
         stmt = select(FreeTimeModel).where(
             FreeTimeModel.user_id == user_id,
-            FreeTimeModel.start >= start_of_day,
-            FreeTimeModel.end <= end_of_day,
+            or_(
+                and_(
+                    FreeTimeModel.start >= start_of_day,
+                    FreeTimeModel.start < end_of_day,
+                ),
+                and_(FreeTimeModel.end > start_of_day, FreeTimeModel.end <= end_of_day),
+                and_(
+                    FreeTimeModel.start < start_of_day, FreeTimeModel.end > end_of_day
+                ),
+            ),
         )
         result = await self.session.execute(stmt)
         free_time_models = result.scalars().all()
@@ -74,6 +83,16 @@ class FreeTimeRepo(BaseModel):
             FreeTimeModel.user_id == user_id,
             FreeTimeModel.start >= start_of_day,
             FreeTimeModel.end <= end_of_day,
+            or_(
+                and_(
+                    FreeTimeModel.start >= start_of_day,
+                    FreeTimeModel.start < end_of_day,
+                ),
+                and_(FreeTimeModel.end > start_of_day, FreeTimeModel.end <= end_of_day),
+                and_(
+                    FreeTimeModel.start < start_of_day, FreeTimeModel.end > end_of_day
+                ),
+            ),
         )
         result = await self.session.execute(stmt)
         free_time_models = result.scalars().all()
