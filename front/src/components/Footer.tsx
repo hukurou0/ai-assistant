@@ -1,41 +1,54 @@
 'use client'
 
-import Link from 'next/link'
-import ScheduleIcon from './ui/icons/ScheduleIcon'
-import ScheduleFillIcon from './ui/icons/ScheduleFillIcon'
 import { usePathname } from 'next/navigation'
 
-import SettingIcon from './ui/icons/Setting'
-import SettingFillIcon from './ui/icons/SettingFill'
+import { AiOutlineCalendar, AiFillCalendar } from "react-icons/ai";
+import { AiOutlineSetting, AiFillSetting } from "react-icons/ai";
+import { AiOutlineCheckSquare, AiFillCheckSquare } from "react-icons/ai";
+import Link from 'next/link'
 
 const menu = [
   {
-    href: '/',
-    icon: <ScheduleIcon />,
-    clickerIcon: <ScheduleFillIcon />,
+    href: '/home',
+    name: 'Home',
+    icon: <AiOutlineCalendar className='w-7 h-7' />,
+    clickerIcon: <AiFillCalendar className='w-7 h-7' />,
+  },
+  {
+    href: '/task',
+    name: 'Task',
+    icon: <AiOutlineCheckSquare className='w-7 h-7' />,
+    clickerIcon: <AiFillCheckSquare className='w-7 h-7' />,
   },
   {
     href: '/setting',
-    icon: <SettingIcon />,
-    clickerIcon: <SettingFillIcon />,
+    name: 'Setting',
+    icon: <AiOutlineSetting className='w-7 h-7' />,
+    clickerIcon: <AiFillSetting className='w-7 h-7' />,
   },
 ]
 
 export default function Footer() {
   const pathName = usePathname()
   return (
-    <div className="fixed bottom-0 w-full bg-slate-300 text-white p-4 text-center">
-      <nav className='flex justify-center'>
-        <ul className='flex gap-4 items-center'>
-          {menu.map(item => (
-            <li key={item.href}>
-              <Link href={item.href}>
+    <> 
+    <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+      <div className="flex items-center justify-center h-16">
+        <div className="grid grid-cols-3 gap-4">
+          {menu.map((item, index) => (
+            <Link href={item.href} key={index}>
+              <button type="button" className="flex flex-col items-center justify-center px-5 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 group">
                 {pathName === item.href ? item.clickerIcon : item.icon}
-              </Link>
-            </li>
+                <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">{item.name}</span>
+              </button>
+            </Link>
           ))}
-        </ul>
-      </nav>
+        </div>
+      </div>
     </div>
-      )
-    }
+
+
+    </>
+
+  )
+}

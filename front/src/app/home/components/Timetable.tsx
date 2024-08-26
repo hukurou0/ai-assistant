@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Event from './Event'
-import FreeTime from './FreeTime';
+import FreeTime from './FreeTime'
 import { ScheduleDataList, ScheduleData, EventData, FreeTimeData, FetchData} from '@/app/api/schedule/route';
 import { ClientAxiosUtil } from '@/util/axios-base';
-import { CloudSyncIcon } from './ui/icons/CloudSyncIcon';
+import { AiOutlineCloudSync } from "react-icons/ai";
 //import { scheduleDataList } from '@/mockData/sampleSchedule';
 
 export default function Timetable() {
@@ -76,7 +76,7 @@ export default function Timetable() {
     <>
     <div className="relative">
       <button type="button" onClick={handleScheduleSync} className="fixed bottom-20 right-5 text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800 dark:hover:bg-blue-500 z-10">
-        <CloudSyncIcon />
+        <AiOutlineCloudSync className='h-10 w-10'/>
       </button>
       <ol className="relative border-l border-gray-200 dark:border-gray-700">
         {schedule.map((schedule) => {

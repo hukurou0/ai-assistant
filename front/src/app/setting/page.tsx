@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/util/auth';
 import { redirect } from 'next/navigation';
-import Setting from '@/components/Setting';
+import Setting from '@/app/setting/components/Setting';
 import Box from '@/components/Box';
 import Login from '@/components/Login';
 
@@ -19,7 +19,7 @@ const Settings = async () => {
           <Login />
         </Box>
       ) : (
-        <Setting />
+          <Setting />
       )}
     </>
   );
