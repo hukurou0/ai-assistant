@@ -1,8 +1,16 @@
+'use client'
+
 import React from 'react'
 import Box from './Box'
 import Logout from './Logout'
+import { SmallCloudSyncIcon } from './ui/icons/CloudSyncIcon'
+import { ClientAxiosUtil } from '@/util/axios-base'
 
 export default function Setting() {
+  const handleTodoSync = async () => {
+    const axiosBase = new ClientAxiosUtil();
+    await axiosBase.get('/sync/google-todo');
+  }
   return (
     <Box>
     <div className="h-screen flex flex-col items-center">
@@ -34,6 +42,9 @@ export default function Setting() {
           </div>
           <div className="flex items-center justify-between py-2">
             <span className="text-lg">TODO連携</span>
+            <button type="button" onClick={handleTodoSync} className="fixed right-8 text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs p-1 text-center inline-flex items-center me-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800 dark:hover:bg-blue-500">
+              <SmallCloudSyncIcon />
+            </button>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

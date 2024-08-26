@@ -2,6 +2,7 @@ import { FetchData, SuggestTodoData } from '@/app/api/suggest/route';
 import { ClientAxiosUtil } from '@/util/axios-base';
 import React, { useEffect, useState } from 'react'
 import SuggestTodo from './SuggestTodo';
+//import { suggestTodoDataSample } from '@/mockData/sampleSuggestTodo';
 
 export default function SuggestTodoList(props: {id:string}) {
   const [suggestTodos, setSuggestTodos] = useState<SuggestTodoData[]>([]);
@@ -35,6 +36,7 @@ export default function SuggestTodoList(props: {id:string}) {
       }
     }
     fetchData();
+    //setSuggestTodos(suggestTodoDataSample);
   }, []);
 
   return ( 
