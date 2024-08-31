@@ -5,7 +5,7 @@ from src.domain.entities.suggest_todo import SuggestTodo, SuggestTodos
 
 from src.repository.free_time_repo import FreeTimeRepo
 from src.repository.user_repo import UserRepo
-from src.repository.todo_list_repo import TodoListRepo
+from src.repository.todo_repo import TodoRepo
 from src.repository.suggest_todo_repo import SuggestTodoRepo
 
 from src.service.suggest_todo.algorithm.dynamic_programming import DPAlgorithm
@@ -30,6 +30,7 @@ class SuggestTodoService(BaseModel):
 
     async def find_well_todos(self, user_id: str, free_time_id: str) -> SuggestTodos:
         user_repo = UserRepo(session=self.session)
+        raise
         todo_list_repo = TodoListRepo(session=self.session)
         user = await user_repo.fetch_user_by_id(user_id)
         todo_lists = await todo_list_repo.fetch_user_lists_with_todos(user)

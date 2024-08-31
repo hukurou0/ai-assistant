@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from typing import Any
 from src.domain.entities.suggest_todo import SuggestTodos, SuggestTodo
 
-from src.repository.todo_list_repo import TodoMapper
+from src.repository.todo_repo import TodoMapper
 from src.repository.free_time_repo import FreeTimeMapper
 
 

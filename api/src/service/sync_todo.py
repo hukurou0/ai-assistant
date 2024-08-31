@@ -2,49 +2,45 @@ from pydantic import BaseModel
 from typing import Any
 
 from src.repository.google_todo_repo import GoogleTodoRepository
-from src.repository.todo_list_repo import TodoListRepo
+from src.repository.todo_repo import TodoRepo
 from src.repository.user_repo import UserRepo
+from src.domain.entities.todo import TodoStatus
 from src.service.shared.provider.evaluation.gpt4omini.gpt4omini_evaluation import (
     GPT4OMiniEvaluationProvider,
 )
 
-from src.util.handle_time import get_now_datetime
+from src.domain.entities.todo import Todo
 
 
 class SyncTodoService(BaseModel):
     session: Any
 
     async def execute(self, user_id: str):
+        # Google TasksからTodoを取得し、DBに保存する
         user_repo = UserRepo(session=self.session)
         user = await user_repo.fetch_user_by_id(user_id)
 
         google_todo_repo = GoogleTodoRepository(session=self.session)
-        todo_lists = await google_todo_repo.fetch_todo_lists(user)
+        todos = await google_todo_repo.fetch_todos(user)
 
-        todo_list_repo = TodoListRepo(session=self.session)
-        for todo_list in todo_lists:
-            if await todo_list_repo.fetch_list_by_id(todo_list.id):
-                await todo_list_repo.update_list(todo_list)
-            else:
-                await todo_list_repo.create_list_with_todos(todo_list, user)
-        user_todo_lists = await todo_list_repo.fetch_user_lists_with_todos(user)
-        for user_todo_list in user_todo_lists:
-            # 評価実行-新規作成のリスト
-            if not user_todo_list.last_evaluation:
-                await GPT4OMiniEvaluationProvider(
-                    session=self.session
-                ).evaluation_todo_in_list(user_todo_list)
-                user_todo_list.last_evaluation = get_now_datetime()
-                await todo_list_repo.update_list(user_todo_list)
-            # 評価実行-todoの内容に変更があり
-            elif user_todo_list.updated > user_todo_list.last_evaluation:
-                await GPT4OMiniEvaluationProvider(
-                    session=self.session
-                ).evaluation_todo_in_list(user_todo_list)
-                user_todo_list.last_evaluation = get_now_datetime()
-                await todo_list_repo.update_list(user_todo_list)
-            # 再評価の必要なし
-            else:
-                pass
+        todo_repo = TodoRepo(session=self.session)
+        await todo_repo.batch_create(todos)
+
+        # Todoの評価を行う
+        todos = await todo_repo.fetch_todos_by_user(user)
+        need_evaluation_todos = [
+            todo
+            for todo in todos
+            if todo.status == TodoStatus.TODO and todo.required_time == None
+        ]
+        if need_evaluation_todos:
+            evaluation_provider = GPT4OMiniEvaluationProvider(session=self.session)
+            evaluated_todos: list[Todo] = []
+            for todo in need_evaluation_todos:
+                evaluated_todo = await evaluation_provider.evaluate(todo)
+                if evaluated_todo:
+                    evaluated_todos.append(evaluated_todo)
+
+            await todo_repo.batch_updated(evaluated_todos)
 
         return "finished"

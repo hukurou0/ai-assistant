@@ -3,7 +3,7 @@ from typing import Any
 
 from src.domain.entities.todo import Todo
 
-from src.service.shared.provider.local_todo import LocalTodoProvider
+from src.repository.todo_repo import TodoRepo
 from src.repository.free_time_repo import FreeTimeRepo
 
 from datetime import datetime

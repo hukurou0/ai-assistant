@@ -1,17 +1,27 @@
 from pydantic import BaseModel
 from typing import Optional
+from enum import Enum
 from src.domain.vos.evaluation_parms import EvaluationParmsVO
+from datetime import datetime
+from src.domain.entities.user import User
+from src.domain.entities.tag import Tag
+
+
+class TodoStatus(str, Enum):
+    TODO = "todo"
+    IN_PROGRESS = "inProgress"
+    COMPLETED = "completed"
 
 
 class Todo(BaseModel):
     ## Original
     id: str
+    user: User
     title: str
     notes: str
-    updated: str
-    position: str
-    status: str
-    due: str
+    status: TodoStatus
+    due: Optional[datetime]
+    tags: list[Tag]
 
     ## Evaluation
     required_time: Optional[int] = None
