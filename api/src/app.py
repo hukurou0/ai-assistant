@@ -4,7 +4,6 @@ from fastapi import Depends, HTTPException
 
 from src.service.suggest_todo.suggest_todo_service import SuggestTodoService
 from src.service.sync_todo import SyncTodoService
-from src.service.selected_todo import SelectedTodosService
 from src.service.schedule import ScheduleService
 from src.service.user import UserService
 

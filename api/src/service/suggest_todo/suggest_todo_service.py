@@ -19,8 +19,10 @@ class SuggestTodoService(BaseModel):
     async def get_suggest_todos(
         self, user_id: str, free_time_id: str
     ) -> tuple[str, list[SuggestTodoVO]]:
+        user_repo = UserRepo(session=self.session)
+        user = await user_repo.fetch_user_by_id(user_id)
         suggest_todo_repo = SuggestTodoRepo(session=self.session)
-        suggest_todos = await suggest_todo_repo.fetch_by_free_time(free_time_id)
+        suggest_todos = await suggest_todo_repo.fetch_by_free_time(free_time_id, user)
         if suggest_todos:
             return free_time_id, suggest_todos.to_vos()
         else:
@@ -30,18 +32,14 @@ class SuggestTodoService(BaseModel):
 
     async def find_well_todos(self, user_id: str, free_time_id: str) -> SuggestTodos:
         user_repo = UserRepo(session=self.session)
-        raise
-        todo_list_repo = TodoListRepo(session=self.session)
+        todo_repo = TodoRepo(session=self.session)
         user = await user_repo.fetch_user_by_id(user_id)
-        todo_lists = await todo_list_repo.fetch_user_lists_with_todos(user)
-        all_todos = []
-        for todo_list in todo_lists:
-            all_todos.extend(todo_list.get_todos())
+        todos = await todo_repo.fetch_todos_by_user(user)
 
         free_time_repo = FreeTimeRepo(session=self.session)
         free_time = await free_time_repo.fetch_by_id(free_time_id)
 
-        well_todos = DPAlgorithm(free_time=free_time, todos=all_todos).execute()
+        well_todos = DPAlgorithm(free_time=free_time, todos=todos).execute()
 
         suggest_todos = SuggestTodos(
             free_time=free_time,
