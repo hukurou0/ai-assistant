@@ -2,18 +2,11 @@
 
 import { usePathname } from 'next/navigation'
 
-import { AiOutlineCalendar, AiFillCalendar } from "react-icons/ai";
 import { AiOutlineSetting, AiFillSetting } from "react-icons/ai";
 import { AiOutlineCheckSquare, AiFillCheckSquare } from "react-icons/ai";
 import Link from 'next/link'
 
 const menu = [
-  {
-    href: '/home',
-    name: 'Home',
-    icon: <AiOutlineCalendar className='w-7 h-7' />,
-    clickerIcon: <AiFillCalendar className='w-7 h-7' />,
-  },
   {
     href: '/task',
     name: 'Task',
@@ -34,7 +27,7 @@ export default function Footer() {
     <> 
     <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
       <div className="flex items-center justify-center h-16">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {menu.map((item, index) => (
             <Link href={item.href} key={index}>
               <button type="button" className="flex flex-col items-center justify-center px-5 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 group">
