@@ -16,14 +16,16 @@ class SyncTodoService(BaseModel):
     session: Any
 
     async def execute(self, user_id: str):
+        # todoをすべて削除する
+        todo_repo = TodoRepo(session=self.session)
+        await todo_repo.delete_all_by_user_id(user_id)
+
         # Google TasksからTodoを取得し、DBに保存する
         user_repo = UserRepo(session=self.session)
         user = await user_repo.fetch_user_by_id(user_id)
 
         google_todo_repo = GoogleTodoRepository(session=self.session)
         todos = await google_todo_repo.fetch_todos(user)
-
-        todo_repo = TodoRepo(session=self.session)
         await todo_repo.batch_create(todos)
 
         # Todoの評価を行う

@@ -106,3 +106,11 @@ class TodoRepo(BaseModel):
 
     async def delete(self):
         pass
+
+    async def delete_all_by_user_id(self, user_id: str):
+        stmt = select(TodoModel).where(TodoModel.user_id == user_id)
+        result = await self.session.execute(stmt)
+        todo_models: list[TodoModel] = result.scalars().all()
+        for todo_model in todo_models:
+            await self.session.delete(todo_model)
+        await self.session.commit()
