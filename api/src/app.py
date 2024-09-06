@@ -179,3 +179,32 @@ async def refresh(
         "access_token": new_access_token,
         "access_token_expires_in": access_token_expires_in,
     }
+
+
+@app.get("/test")
+async def test(
+    db: AsyncSession = Depends(get_db_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    from src.repository.todo_repo import TodoRepo
+    from src.repository.user_repo import UserRepo
+
+    todo_repo = TodoRepo(session=db)
+    user_repo = UserRepo(session=db)
+    user = await user_repo.fetch_user_by_id(user_id)
+    todos = await todo_repo.fetch_todos_by_user(user)
+
+    import csv
+
+    header = ["id", "title", "notes", "tags"]
+    data = []
+    for todo in todos:
+        tags = "+".join([tag.name for tag in todo.tags])
+        data.append([todo.id, todo.title, todo.notes, tags])
+
+    with open("todos.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(data)
+
+    return {"message": "test"}
