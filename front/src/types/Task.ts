@@ -5,6 +5,7 @@ type Task = {
     recommended: boolean;
     forToday: boolean;
     reason?: string;
+    createdAt: Date;
   }
 
 export default Task;

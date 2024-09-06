@@ -13,10 +13,10 @@ import Task from '../../../types/Task';
 
 export default function AddTaskButton() {
   const [tasks, setTasks] = useState<Task[]>([
-    { id: 1, text: "プロジェクト計画を立てる", completed: false, recommended: true, forToday: true, reason: "期限が近づいているため、優先度が高いです。" },
-    { id: 2, text: "買い物リストを作成", completed: false, recommended: false, forToday: false },
-    { id: 3, text: "ジムに行く", completed: false, recommended: true, forToday: true, reason: "定期的な運動は健康に良いです。今日は時間に余裕がありそうです。" },
-    { id: 4, text: "読書をする", completed: false, recommended: true, forToday: false, reason: "最近読書の時間が取れていないようです。今日は良い機会かもしれません。" },
+    { id: 1, text: "プロジェクト計画を立てる", completed: false, recommended: true, forToday: true, reason: "期限が近づいているため、優先度が高いです。", createdAt: new Date() },
+    { id: 2, text: "買い物リストを作成", completed: false, recommended: false, forToday: false, createdAt: new Date() },
+    { id: 3, text: "ジムに行く", completed: false, recommended: true, forToday: true, reason: "定期的な運動は健康に良いです。今日は時間に余裕がありそうです。", createdAt: new Date() },
+    { id: 4, text: "読書をする", completed: false, recommended: true, forToday: false, reason: "最近読書の時間が取れていないようです。今日は良い機会かもしれません。", createdAt: new Date() },
   ]);
   const [newTask, setNewTask] = useState("");
   const [isNewTaskForToday, setIsNewTaskForToday] = useState(false);
@@ -30,6 +30,7 @@ export default function AddTaskButton() {
         completed: false,
         recommended: false,
         forToday: isNewTaskForToday,
+        createdAt: new Date(),
       };
       setTasks([...tasks, newTaskObj]);
       setNewTask("");

@@ -16,7 +16,7 @@ export default async function Home() {
 
   return (
     <>
-    {false ? (
+    {session?.error === 'RefreshTokenExpiredError' || !session ? (
       <Box>
         <Login />
       </Box>
