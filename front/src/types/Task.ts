@@ -3,9 +3,10 @@ type Task = {
     text: string;
     completed: boolean;
     recommended: boolean;
-    forToday: boolean;
+    priority: boolean;
     reason?: string;
     createdAt: Date;
+    tag: string;
   }
 
 export default Task;

@@ -14,7 +14,10 @@ from src.util.handle_time import get_now_datetime
 
 # ルートエンドポイント
 @app.get("/")
-async def read_root():
+async def read_root(
+    user_id: str = Depends(get_current_user_id),
+):
+    print(user_id)
     return {"message": "hello_world"}
 
 

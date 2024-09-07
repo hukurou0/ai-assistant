@@ -5,39 +5,28 @@ import React, { useState } from 'react'
 import { Switch } from "../../../components/ui/switch"
 import { Label } from "../../../components/ui/label"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../../../components/ui/sheet"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
 import { Button } from "../../../components/ui/button"
 import { Input } from "../../../components/ui/input"
 import { Plus } from "lucide-react"
 
-import Task from '../../../types/Task';
+import { TaskStore } from '../task-store'
+import { TagOption, tagOptions } from '../../../types/Tag';
 
 export default function AddTaskButton() {
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: 1, text: "プロジェクト計画を立てる", completed: false, recommended: true, forToday: true, reason: "期限が近づいているため、優先度が高いです。", createdAt: new Date() },
-    { id: 2, text: "買い物リストを作成", completed: false, recommended: false, forToday: false, createdAt: new Date() },
-    { id: 3, text: "ジムに行く", completed: false, recommended: true, forToday: true, reason: "定期的な運動は健康に良いです。今日は時間に余裕がありそうです。", createdAt: new Date() },
-    { id: 4, text: "読書をする", completed: false, recommended: true, forToday: false, reason: "最近読書の時間が取れていないようです。今日は良い機会かもしれません。", createdAt: new Date() },
-  ]);
+  const taskStore = TaskStore.useContainer();
   const [newTask, setNewTask] = useState("");
-  const [isNewTaskForToday, setIsNewTaskForToday] = useState(false);
+  const [isNewTaskpriority, setIsNewTaskpriority] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [newTaskTag, setNewTaskTag] = useState<TagOption>("その他");
 
   const addTask = () => {
-    if (newTask.trim() !== "") {
-      const newTaskObj: Task = {
-        id: Date.now(),
-        text: newTask,
-        completed: false,
-        recommended: false,
-        forToday: isNewTaskForToday,
-        createdAt: new Date(),
-      };
-      setTasks([...tasks, newTaskObj]);
-      setNewTask("");
-      setIsNewTaskForToday(false);
-      setIsDrawerOpen(false);
-    }
-  };
+    taskStore.addTask(newTask, isNewTaskpriority, newTaskTag);
+    setNewTask("");
+    setNewTaskTag("その他");
+    setIsNewTaskpriority(false);
+    setIsDrawerOpen(false);
+  }
 
   return (
     <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
@@ -58,18 +47,47 @@ export default function AddTaskButton() {
             </SheetDescription>
           </SheetHeader>
           <div className="grid gap-4 py-4">
-            <Input
-              placeholder="タスクを入力"
-              value={newTask}
-              onChange={(e) => setNewTask(e.target.value)}
-            />
+            <div>
+              <Label htmlFor="new-task" className="block mb-2">
+                タスク内容
+              </Label>
+              <Input
+                id="new-task"
+                placeholder="タスクを入力"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="new-task-tag" className="block mb-2">
+                タグ設定
+              </Label>
+              <Select
+                value={newTaskTag}
+                onValueChange={(value: TagOption) => setNewTaskTag(value)}
+              >
+                <SelectTrigger id="new-task-tag">
+                  <SelectValue placeholder="タグを選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  {tagOptions.map((tag) => (
+                    <SelectItem key={tag} value={tag}>
+                      {tag}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground mt-1">
+                タスクの分類に役立つタグを選択してください。
+              </p>
+            </div>
             <div className="flex items-center space-x-2">
               <Switch
                 id="today-task"
-                checked={isNewTaskForToday}
-                onCheckedChange={setIsNewTaskForToday}
+                checked={isNewTaskpriority}
+                onCheckedChange={setIsNewTaskpriority}
               />
-              <Label htmlFor="today-task">今日のタスクに追加</Label>
+              <Label htmlFor="today-task">優先のタスクに追加</Label>
             </div>
             <Button onClick={addTask}>タスクを追加</Button>
           </div>
