@@ -2,6 +2,10 @@ import './globals.css';
 import { Open_Sans } from 'next/font/google';
 import AuthContext from '@/context/AuthContext';
 import Footer from '@/components/Footer';
+import Box from '@/components/Box';
+import Login from '@/components/Login';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/util/auth';
 
 const openSans = Open_Sans({ subsets: ['latin'] });
 
@@ -24,12 +28,22 @@ export const metadata = {
 export const viewport = 'width=device-width, initial-scale=1';
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authOptions);
   return (
     <html lang='en' className={openSans.className}>
       <body className='w-full max-w-screen-xl overflow-auto mx-auto'>
         <AuthContext>
-          <main>{children}</main>
-          <Footer />
+          { !session || session?.error === 'RefreshTokenExpiredError' ? (
+            <Box className='flex mt-5 justify-center items-center'>
+              <Login />
+            </Box>
+            ) : (
+              <>
+              <main>{children}</main>
+              <Footer />
+              </>
+            )
+          }
         </AuthContext>
       </body>
     </html>

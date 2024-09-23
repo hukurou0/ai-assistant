@@ -5,9 +5,7 @@ import { signIn } from 'next-auth/react';
 const Login = () => {
   return (
     <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-        <a href="#">
-        <img className="rounded-t-lg" src="/icons/hukurou.png" alt="" />
-        </a>
+      <img className="rounded-t-lg" src="/icons/hukurou.png" alt="" />
       <div className="w-full max-w-md p-8 space-y-8 rounded shadow-md">
         <h2 className="text-2xl font-bold text-center text-gray-900">ようこそ</h2>
         <p className="text-center text-gray-600">Google連携でCalendarとTaskを連携します</p>
